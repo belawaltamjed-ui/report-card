@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Card Maker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:#f3efe3;font-family:'Noto Sans Bengali',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+    .stage{width:100%;max-width:460px;transition:max-width .3s ease;}
+    .stage.wide{max-width:900px;}
+    .dash{background:#fff;border-radius:24px;padding:28px 24px 32px;box-shadow:0 12px 40px rgba(45,30,10,0.10);border:1px solid #d8cfb8;}
+    .dash-head{display:flex;align-items:center;gap:14px;border-bottom:1px solid #d8cfb8;padding-bottom:18px;margin-bottom:22px;}
+    .dash-logo{width:52px;height:52px;border-radius:12px;background:#f3efe3;border:1px solid #d8cfb8;display:flex;align-items:center;justify-content:center;font-size:26px;color:#7a1f2b;flex-shrink:0;overflow:hidden;}
+    .dash-logo img{width:100%;height:100%;object-fit:contain;}
+    .dash-name{font-family:'Noto Serif Bengali',serif;font-weight:700;font-size:18px;margin:0;color:#211e1a;}
+    .dash-badge{font-size:11px;font-weight:700;color:#7a1f2b;background:#fbf1ec;padding:2px 14px;border-radius:30px;display:inline-block;margin-top:4px;}
+    .dash-rows{font-size:13px;color:#6b6455;line-height:2;margin-bottom:20px;}
+    .dash-rows b{color:#211e1a;font-weight:600;}
+    .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:22px 0 18px;}
+    .card-box{background:#fbf9f3;border-radius:20px;padding:22px 14px 18px;text-align:center;cursor:pointer;border:2px solid transparent;transition:all 0.25s ease;box-shadow:0 4px 12px rgba(0,0,0,0.02);position:relative;overflow:hidden;}
+    .card-box::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 20% 30%, rgba(255,255,240,0.3), transparent 70%);pointer-events:none;}
+    .card-box:hover{transform:translateY(-6px);box-shadow:0 16px 36px rgba(45,30,10,0.12);border-color:#dcc898;}
+    .card-box .big-icon{font-size:40px;display:block;margin-bottom:6px;transition:transform 0.2s;}
+    .card-box:hover .big-icon{transform:scale(1.06) rotate(-2deg);}
+    .card-box h3{font-family:'Noto Serif Bengali',serif;font-size:19px;font-weight:700;margin:0 0 4px;letter-spacing:0.3px;}
+    .card-box .sub-line{font-size:12px;color:#6b6455;margin-top:4px;opacity:0.8;}
+    .card-box .chip{display:inline-block;background:#7a1f2b;color:#fff;font-size:11px;font-weight:600;padding:3px 18px;border-radius:30px;margin-top:10px;}
+    .card-box.general{border-color:#7a1f2b;background:#fcf6f0;}
+    .card-box.general:hover{border-color:#5a1620;background:#faf0ea;}
+    .card-box.vocational{border-color:#ad8a4e;background:#fbf7ed;}
+    .card-box.vocational:hover{border-color:#9b7a3e;background:#f8f2e4;}
+    .card-box .tag{position:absolute;top:10px;right:12px;font-size:10px;font-weight:700;background:rgba(0,0,0,0.04);padding:2px 12px;border-radius:30px;color:#6b6455;letter-spacing:0.3px;}
+    .action-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px;}
+    .action-card{background:#fbf9f3;border:1px solid #d8cfb8;border-radius:16px;padding:20px 12px 16px;text-align:center;cursor:pointer;transition:all 0.2s;}
+    .action-card:hover{border-color:#ad8a4e;box-shadow:0 4px 16px rgba(0,0,0,0.04);background:#fffdf8;}
+    .action-card .icon{font-size:30px;display:block;margin-bottom:4px;}
+    .action-card h4{font-family:'Noto Serif Bengali',serif;font-size:14px;margin:0 0 2px;}
+    .action-card p{font-size:11px;color:#6b6455;margin:0;}
+    .btn-text{background:none;border:none;color:#6b6455;font-weight:600;font-size:13px;text-decoration:underline;cursor:pointer;display:inline-block;}
+    .btn{width:100%;padding:12px;border:none;border-radius:8px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:18px;}
+    .btn-primary{background:#7a1f2b;color:#fff;}
+    .btn-primary:hover{background:#5a1620;}
+    .btn-outline{background:#fff;color:#7a1f2b;border:1.5px solid #7a1f2b;}
+    .btn-outline:hover{background:#fbf1ec;}
+    .btn-gold{background:#ad8a4e;color:#fff;}
+    .btn-gold:hover{background:#8a6e3e;}
+    .builder{background:#fff;border:1px solid #d8cfb8;border-radius:14px;padding:22px 24px;margin-top:18px;box-shadow:0 10px 30px rgba(45,30,10,.08);position:relative;}
+    .builder h2{font-family:'Noto Serif Bengali',serif;font-size:18px;margin:0 0 4px;}
+    .builder p.sub{font-size:13px;color:#6b6455;margin:0 0 16px;}
+    .top-back{display:flex;justify-content:flex-end;margin-bottom:12px;border-bottom:1px solid #f0ede5;padding-bottom:10px;}
+    .top-back .btn-text{font-size:13px;color:#7a1f2b;font-weight:700;text-decoration:none;background:#fbf1ec;padding:6px 16px;border-radius:30px;border:1px solid #d8cfb8;transition:all 0.2s;}
+    .top-back .btn-text:hover{background:#f3e0d8;border-color:#7a1f2b;}
+    input[type="text"],input[type="number"]{width:100%;padding:10px 14px;border:1px solid #d8cfb8;border-radius:8px;font-size:14px;font-family:inherit;background:#fbf9f3;color:#211e1a;}
+    input:focus{outline:2px solid #dcc898;border-color:#ad8a4e;}
+    .form-row{display:grid;grid-template-columns:2fr 1fr;gap:10px;margin-bottom:10px;}
+    .parts-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+    .part-choice{padding:8px 14px;border:1.5px solid #d8cfb8;border-radius:20px;background:#fbf9f3;font-size:12.5px;font-weight:600;cursor:pointer;font-family:'Noto Sans Bengali',sans-serif;}
+    .part-choice.picked{border-color:#7a1f2b;background:#fbf1ec;color:#5a1620;}
+    .part-tag{display:inline-block;padding:1px 6px;margin-left:4px;background:#eae5d8;border-radius:4px;font-size:10px;}
+    .added-list{list-style:none;padding:0;margin:0 0 14px;}
+    .added-list li{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:1px solid #d8cfb8;border-radius:7px;margin-bottom:6px;font-size:12.5px;background:#fbf9f3;}
+    .added-list .del{background:none;border:none;color:#7a1f2b;font-size:16px;cursor:pointer;}
+    .class-list{list-style:none;padding:0;margin:0 0 16px;}
+    .class-item{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border:1px solid #d8cfb8;border-radius:9px;margin-bottom:8px;background:#fbf9f3;cursor:pointer;}
+    .class-item:hover{border-color:#ad8a4e;}
+    .class-item .ci-name{font-weight:700;font-size:13.5px;font-family:'Noto Serif Bengali',serif;}
+    .class-item .ci-sub{font-size:11px;color:#6b6455;margin-top:2px;}
+    .class-item .ci-arrow{color:#ad8a4e;font-size:16px;}
+    .empty-note{font-size:12px;color:#6b6455;text-align:center;padding:14px 0;}
+    .sheet-wrap{overflow-x:auto;border:1px solid #d8cfb8;border-radius:10px;margin-bottom:14px;}
+    table.sheet{border-collapse:collapse;width:100%;font-size:12px;font-family:'Noto Sans Bengali',sans-serif;}
+    table.sheet th{background:#f3efe3;border:1px solid #d8cfb8;padding:7px 6px;font-weight:700;white-space:nowrap;}
+    table.sheet td{border:1px solid #d8cfb8;padding:3px;}
+    table.sheet input{width:100%;min-width:56px;padding:6px 5px;border:none;background:transparent;font-size:12px;font-family:inherit;text-align:center;}
+    table.sheet input:focus{outline:2px solid #dcc898;background:#fff;}
+    table.sheet td.nm input{text-align:left;min-width:120px;}
+    table.sheet .rowdel{background:none;border:none;color:#7a1f2b;font-size:15px;cursor:pointer;padding:0 6px;}
+    .sheet-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+    .sheet-actions .btn{margin-top:0;flex:1;min-width:140px;}
+    .subject-list-wrap{max-height:300px;overflow-y:auto;border:1px solid #d8cfb8;border-radius:8px;padding:8px;margin-bottom:12px;}
+    .subject-list-wrap .sub-item{display:flex;justify-content:space-between;padding:6px 10px;border-bottom:1px solid #eee;font-size:12px;}
+    .subject-list-wrap .sub-item:last-child{border-bottom:none;}
+    .subject-list-wrap .sub-item .sub-del{color:#7a1f2b;cursor:pointer;font-weight:700;}
+    .suggest-chip{display:inline-block;padding:5px 11px;margin:0 6px 6px 0;border:1px dashed #ad8a4e;border-radius:20px;font-size:11.5px;cursor:pointer;color:#5a1620;background:#fbf9f3;}
+    .status-input-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0;}
+    .status-input-row input{width:100%;padding:6px 10px;border:1px solid #d8cfb8;border-radius:6px;font-size:12px;background:#fbf9f3;text-align:center;}
+    .status-input-row label{font-size:11px;color:#6b6455;font-weight:600;display:block;margin-bottom:2px;}
+    .sig-edit-area{margin:12px 0;padding:14px;background:#fbf9f3;border:1px solid #d8cfb8;border-radius:10px;}
+    .sig-edit-area .sig-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+    .sig-edit-area .sig-item{display:flex;flex-direction:column;gap:4px;align-items:center;}
+    .sig-edit-area .sig-item label{font-size:11px;color:#6b6455;font-weight:600;}
+    .sig-edit-area .sig-item input[type="text"]{width:150px;padding:6px 10px;border:1px solid #d8cfb8;border-radius:6px;font-size:12px;background:#fff;text-align:center;}
+    .sig-edit-area .sig-item .sig-img-preview{width:60px;height:60px;border:1px solid #ccc;border-radius:6px;object-fit:contain;background:#fff;margin-top:4px;}
+    .opt-cards{display:flex;flex-direction:column;gap:12px;margin:14px 0;}
+    .opt-card{border:1.5px solid #d8cfb8;border-radius:12px;padding:18px;cursor:pointer;text-align:left;background:#fbf9f3;display:flex;align-items:center;gap:14px;}
+    .opt-card:hover{border-color:#7a1f2b;background:#fbf1ec;}
+    .opt-card .oc-icon{width:38px;height:38px;border-radius:9px;background:#7a1f2b;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+    .opt-card .oc-title{font-weight:700;font-size:13.5px;font-family:'Noto Serif Bengali',serif;margin:0;}
+    .opt-card .oc-sub{font-size:11.5px;color:#6b6455;margin:2px 0 0;}
+    .tpl-card{background:#fff;border:2px solid #555;padding:22px 26px;font-family:'Georgia','Times New Roman',serif;color:#111;}
+    .tpl-top{display:flex;align-items:flex-start;gap:16px;}
+    .tpl-logo{width:64px;height:64px;object-fit:contain;flex-shrink:0;margin-top:4px;}
+    .tpl-logo-ph{width:64px;height:64px;border:1px solid #999;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#999;font-family:'Noto Sans Bengali',sans-serif;margin-top:4px;overflow:hidden;}
+    .tpl-logo-ph img{width:100%;height:100%;object-fit:contain;}
+    .tpl-titles{flex:1;text-align:center;}
+    .tpl-titles .school{font-size:23px;font-weight:700;margin:0;font-family:Georgia,'Times New Roman',serif;}
+    .tpl-titles .addr{font-size:13px;color:#222;margin:3px 0 1px;font-family:Georgia,serif;}
+    .tpl-titles .script{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:24px;margin:10px 0 0;font-weight:600;}
+    .tpl-titles .exam{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:17px;font-weight:600;}
+    .tpl-info-row{display:flex;gap:10px;margin-top:14px;align-items:flex-start;}
+    table.tpl-info{border-collapse:collapse;flex:1;font-size:12px;font-family:Georgia,serif;}
+    table.tpl-info td{border:1px solid #555;padding:4px 8px;}
+    table.tpl-info td.lbl{color:#333;white-space:nowrap;text-align:right;width:1%;}
+    table.tpl-info td.val{font-weight:600;min-width:70px;}
+    table.tpl-info td.photo-cell{border:1px solid #555;padding:2px;text-align:center;vertical-align:middle;}
+    .photo-box{width:58px;height:66px;border:1px solid #999;display:flex;align-items:center;justify-content:center;font-size:8px;color:#999;font-family:'Noto Sans Bengali',sans-serif;margin:0 auto;overflow:hidden;}
+    .photo-box img{width:100%;height:100%;object-fit:cover;}
+    table.tpl-grade{border-collapse:collapse;font-size:11.5px;font-family:Georgia,serif;flex-shrink:0;}
+    table.tpl-grade th,table.tpl-grade td{border:1px solid #555;padding:3px 9px;text-align:center;}
+    table.tpl-grade th{background:#dadada;font-weight:700;}
+    table.tpl-subjects{width:100%;border-collapse:collapse;margin-top:14px;font-size:11px;font-family:Georgia,serif;table-layout:fixed;}
+    table.tpl-subjects th,table.tpl-subjects td{border:1px solid #555;padding:4px 2px;text-align:center;overflow:hidden;word-break:break-word;}
+    table.tpl-subjects th{background:#eeeeee;font-weight:700;font-family:'Noto Sans Bengali',sans-serif;}
+    table.tpl-subjects td.tname{text-align:left;font-family:'Noto Sans Bengali',sans-serif;}
+    table.tpl-subjects .col-exam{width:36px;}
+    table.tpl-subjects tr.totalrow td{font-weight:700;background:#f5f5f5;}
+    .dim{color:#bbb;}
+    .tpl-remarks-band{border:1px solid #555;border-top:none;padding:6px 10px;font-size:11.5px;font-family:'Noto Sans Bengali',sans-serif;}
+    .tpl-remarks-band b{margin-right:6px;}
+    .tpl-status-row{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:0;margin-top:10px;}
+    table.tpl-status{border-collapse:collapse;width:100%;font-size:11px;font-family:'Noto Sans Bengali',sans-serif;}
+    table.tpl-status td{border:1px solid #555;padding:4px 8px;}
+    table.tpl-status td.lbl{color:#333;width:55%;}
+    table.tpl-status th{border:1px solid #555;background:#eeeeee;font-weight:700;padding:4px 8px;text-align:left;}
+    table.tpl-status td.plain{color:#333;}
+    .tpl-sign-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:40px;text-align:center;font-size:11px;font-family:'Noto Sans Bengali',sans-serif;}
+    .tpl-sign-row .line{border-top:1px solid #000;padding-top:5px;font-weight:600;}
+    .tpl-sign-row .line .sig-img{height:40px;display:block;margin:0 auto 4px;max-width:80px;object-fit:contain;}
+    .tpl-sign-row small{display:block;font-weight:400;color:#555;margin-top:2px;font-size:10px;}
+    .tpl-footer-tiny{display:flex;justify-content:space-between;margin-top:16px;font-size:8.5px;color:#888;font-family:'Noto Sans Bengali',sans-serif;flex-wrap:wrap;gap:4px;}
+    .tpl-empty-row{color:#999;font-size:11px;font-style:italic;}
+    table.classrep{width:100%;border-collapse:collapse;font-size:11.5px;font-family:'Noto Sans Bengali',sans-serif;margin-bottom:14px;}
+    table.classrep th,table.classrep td{border:1px solid #555;padding:5px 6px;text-align:center;}
+    table.classrep th{background:#eeeeee;font-weight:700;}
+    table.classrep td.nm{text-align:left;}
+    table.classrep .res-pass{color:#1b7a3d;font-weight:700;}
+    table.classrep .res-fail{color:#a41f2b;font-weight:700;}
+    .no-print{display:block;}
+    @media print{body *{visibility:hidden;}#printArea,#printArea *{visibility:visible;}#printArea{position:absolute;top:0;left:0;width:100%;margin:0;padding:0;}.no-print{display:none !important;}@page{size:A4 portrait;margin:12mm;}}
+    .progress{display:flex;gap:6px;justify-content:center;margin-bottom:22px;}
+    .progress span{width:7px;height:7px;border-radius:50%;background:#d8cfb8;transition:background .2s;}
+    .progress span.done{background:#ad8a4e;}
+    .progress span.now{background:#7a1f2b;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+    .card-box{animation:floatUp 0.6s ease backwards;}
+    .card-box:nth-child(1){animation-delay:0.05s;}
+    .card-box:nth-child(2){animation-delay:0.15s;}
+    @keyframes floatUp{0%{opacity:0;transform:translateY(24px) scale(0.96);}100%{opacity:1;transform:translateY(0) scale(1);}}
+    .dash-head{animation:fadeIn 0.4s ease;}
+    
+    .loading-page{position:fixed;top:0;left:0;width:100%;height:100%;background:#f3efe3;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:all 0.8s ease;}
+    .loading-page.hide{opacity:0;pointer-events:none;}
+    .loading-logo{width:100px;height:100px;background:#7a1f2b;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:50px;color:#fff;margin-bottom:20px;animation:pulse 1.5s ease-in-out infinite;}
+    .loading-title{font-family:'Noto Serif Bengali',serif;font-size:28px;font-weight:700;color:#7a1f2b;margin-bottom:8px;}
+    .loading-sub{font-size:16px;color:#6b6455;font-weight:400;}
+    .loading-bar{width:300px;height:4px;background:#d8cfb8;border-radius:4px;margin-top:30px;overflow:hidden;}
+    .loading-bar-inner{height:100%;width:0%;background:#7a1f2b;border-radius:4px;animation:loadBar 2s ease forwards;}
+    @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+    @keyframes loadBar{0%{width:0%;}100%{width:100%;}}
+    
+    .shift-select{width:100%;padding:10px 14px;border:1px solid #d8cfb8;border-radius:8px;font-size:14px;font-family:inherit;background:#fbf9f3;color:#211e1a;}
+    .shift-select:focus{outline:2px solid #dcc898;border-color:#ad8a4e;}
+    .logo-upload-area{border:2px dashed #d8cfb8;border-radius:12px;padding:20px;text-align:center;cursor:pointer;background:#fbf9f3;transition:all 0.2s;}
+    .logo-upload-area:hover{border-color:#ad8a4e;background:#fffdf8;}
+    .logo-upload-area img{max-width:100px;max-height:80px;object-fit:contain;border-radius:8px;}
+    .logo-preview{display:flex;flex-direction:column;align-items:center;gap:8px;}
+    .logo-preview .logo-img{width:80px;height:80px;object-fit:contain;border-radius:8px;border:1px solid #d8cfb8;padding:4px;background:#fff;}
+    
+    @media (max-width:480px){.card-grid{grid-template-columns:1fr;}.action-grid{grid-template-columns:1fr;}.stage.wide{max-width:100%;}.tpl-status-row{grid-template-columns:1fr;}.tpl-sign-row{grid-template-columns:1fr;}.status-input-row{grid-template-columns:1fr;}.loading-bar{width:200px;}}
+  </style>
+</head>
+<body>
+  <div class="loading-page" id="loadingPage">
+    <div class="loading-logo">📘</div>
+    <div class="loading-title">Report Card Maker</div>
+    <div class="loading-sub">Created by Tamjed</div>
+    <div class="loading-bar"><div class="loading-bar-inner"></div></div>
+  </div>
+
+<div class="stage">
+  <div class="progress" id="progress" style="display:none;"></div>
+  <div id="stageHost"></div>
+</div>
+<input type="file" id="backupFileInput" accept="application/json" style="display:none;" onchange="importBackup(event)">
+
+<script>
+  // ============================================================
+  // FULL CODE – Report Card Maker
+  // TWO Separate Cards: General & Vocational
+  // Logo: logo.png (you can add logo.png file)
+  // FIX: Failed subjects show F grade
+  // FIX: Logo shows in dashboard and report card
+  // ============================================================
+
+  const ACCOUNT_DATA = {
+    name: 'Kalia Chapra Sugar Mills High School',
+    logo: 'logo.png', // Default logo file
+    established: '1975',
+    address: 'Pakundia, Kishoreganj',
+    eiin: '110567',
+    type: 'General'
+  };
+
+  let SIGNATURES = {
+    principal: { name: '', image: '' },
+    classTeacher: { name: '', image: '' }
+  };
+
+  let CLASS_SUBJECTS = {};
+  let CLASS_RECORDS = [];
+  let CLASS_STATUS = {};
+  let templateSubjects = [];
+  let currentParts = [];
+  let currentPassMarks = {};
+  let currentRecord = null;
+  let classCurrentParts = [];
+  let classCurrentPassMarks = {};
+
+  // Default subjects with pass marks - ATT and LA are NOT selected by default
+  const DEFAULT_SUBJECTS = [
+    { name: 'Bangla 1st', full: 100, parts: ['mcq','cq'], passMarks: { mcq: 10, cq: 23 } },
+    { name: 'Bangla 2nd', full: 100, parts: ['mcq','cq'], passMarks: { mcq: 10, cq: 23 } },
+    { name: 'English 1st', full: 100, parts: ['mcq','cq'], passMarks: { mcq: 10, cq: 23 } },
+    { name: 'English 2nd', full: 100, parts: ['mcq','cq'], passMarks: { mcq: 10, cq: 23 } },
+    { name: 'Mathematics', full: 100, parts: ['mcq','cq'], passMarks: { mcq: 10, cq: 23 } },
+    { name: 'Religion and Moral Education', full: 100, parts: ['mcq','cq'], passMarks: { mcq: 10, cq: 23 } },
+    { name: 'Bangladesh and Global Studies', full: 100, parts: ['mcq','cq'], passMarks: { mcq: 10, cq: 23 } },
+    { name: 'Science', full: 100, parts: ['mcq','cq','pr'], passMarks: { mcq: 10, cq: 23, pr: 8 } },
+    { name: 'Physics', full: 100, parts: ['mcq','cq','pr'], passMarks: { mcq: 10, cq: 23, pr: 8 } },
+    { name: 'Accounting', full: 100, parts: ['mcq','cq'], passMarks: { mcq: 10, cq: 23 } },
+    { name: 'History', full: 100, parts: ['mcq','cq'], passMarks: { mcq: 10, cq: 23 } },
+    { name: 'Biology', full: 100, parts: ['mcq','cq','pr'], passMarks: { mcq: 10, cq: 23, pr: 8 } },
+    { name: 'Chemistry', full: 100, parts: ['mcq','cq','pr'], passMarks: { mcq: 10, cq: 23, pr: 8 } },
+    { name: 'Geography', full: 100, parts: ['mcq','cq'], passMarks: { mcq: 10, cq: 23 } },
+    { name: 'Banking', full: 100, parts: ['mcq','cq'], passMarks: { mcq: 10, cq: 23 } },
+    { name: 'ICT', full: 100, parts: ['mcq','cq','pr'], passMarks: { mcq: 10, cq: 23, pr: 8 } },
+    { name: 'Agricultural Education', full: 100, parts: ['mcq','cq','pr'], passMarks: { mcq: 10, cq: 23, pr: 8 } },
+    { name: 'Higher Mathematics', full: 100, parts: ['mcq','cq'], passMarks: { mcq: 10, cq: 23 } },
+    { name: 'Career Education', full: 100, parts: ['mcq','cq'], passMarks: { mcq: 10, cq: 23 } },
+    { name: 'Trade-1', full: 100, parts: ['mcq','cq','pr'], passMarks: { mcq: 10, cq: 23, pr: 8 } },
+    { name: 'Career', full: 100, parts: ['mcq','cq'], passMarks: { mcq: 10, cq: 23 } },
+    { name: 'Arts and Crafts', full: 100, parts: ['mcq','cq'], passMarks: { mcq: 10, cq: 23 } },
+    { name: 'Trade-2', full: 100, parts: ['mcq','cq','pr'], passMarks: { mcq: 10, cq: 23, pr: 8 } },
+    { name: 'Physical Education and Health', full: 100, parts: ['mcq','cq'], passMarks: { mcq: 10, cq: 23 } },
+    { name: 'Eng: Drawing', full: 100, parts: ['mcq','cq'], passMarks: { mcq: 10, cq: 23 } }
+  ];
+
+  const PART_DEFS = [
+    { key: 'att', label: 'Attendance (ATT)' },
+    { key: 'la', label: 'Class Assessment (LA)' },
+    { key: 'mcq', label: 'MCQ' },
+    { key: 'cq', label: 'CQ' },
+    { key: 'pr', label: 'Practical (PR)' }
+  ];
+  const PASSABLE_PARTS = ['mcq', 'cq', 'pr'];
+  const PART_LABELS = { att: 'ATT', la: 'LA', mcq: 'MCQ', cq: 'CQ', pr: 'PR' };
+  const COLUMN_ORDER = ['att', 'la', 'mcq', 'cq', 'pr'];
+
+  const GRADE_TABLE = [
+    { min: 80, letter: 'A+', point: 5 },
+    { min: 70, letter: 'A', point: 4 },
+    { min: 60, letter: 'A-', point: 3.5 },
+    { min: 50, letter: 'B', point: 3 },
+    { min: 40, letter: 'C', point: 2 },
+    { min: 33, letter: 'D', point: 1 },
+    { min: 0, letter: 'F', point: 0 }
+  ];
+
+  function escapeHtml(str) {
+    return String(str ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;',
+      "'": '&#39;' }[m]));
+  }
+
+  function escapeAttr(str) {
+    return String(str ?? '').replace(/"/g, '&quot;');
+  }
+
+  function gradeFromPercent(pct) {
+    if (typeof pct !== 'number' || isNaN(pct)) return GRADE_TABLE[GRADE_TABLE.length - 1];
+    for (const g of GRADE_TABLE) { if (pct >= g.min) return g; }
+    return GRADE_TABLE[GRADE_TABLE.length - 1];
+  }
+
+  function subjectColumnKeys(s) {
+    if (!s || !Array.isArray(s.parts)) return [];
+    return COLUMN_ORDER.filter(k => s.parts.includes(k));
+  }
+
+  function subjectTotal(student, s) {
+    if (!student || !student.marks || !s || !s.name) return null;
+    const m = student.marks[s.name];
+    if (!m || typeof m !== 'object') return null;
+    const keys = subjectColumnKeys(s);
+    let sum = 0, any = false;
+    keys.forEach(k => {
+      const v = m[k];
+      if (v !== undefined && v !== null && v !== '' && !isNaN(v)) {
+        sum += Number(v);
+        any = true;
+      }
+    });
+    return any ? sum : null;
+  }
+
+  function subjectFailed(student, s) {
+    const total = subjectTotal(student, s);
+    if (total === null) return false;
+    const m = (student && student.marks && s && s.name && student.marks[s.name]) || {};
+    if (s && s.passMarks) {
+      for (const k of PASSABLE_PARTS) {
+        const threshold = s.passMarks[k];
+        if (typeof threshold === 'number' && !isNaN(threshold) && subjectColumnKeys(s).includes(k)) {
+          const v = m[k];
+          if (v !== undefined && v !== null && v !== '' && !isNaN(v)) {
+            if (Number(v) < threshold) return true;
+          }
+        }
+      }
+    }
+    if (s && s.full) {
+      const pct = (total / s.full) * 100;
+      if (gradeFromPercent(pct).point === 0) return true;
+    }
+    return false;
+  }
+
+  function getDefaultClasses(type) {
+    if (type === 'Vocational') {
+      return [
+        { className: '9', section: 'Civil Construction & Safety' },
+        { className: '9', section: 'General Electrical Works' },
+        { className: '10', section: 'Civil Construction & Safety' },
+        { className: '10', section: 'General Electrical Works' }
+      ];
+    }
+    return [
+      { className: '6', section: 'Padma' },
+      { className: '6', section: 'Jaba' },
+      { className: '7', section: 'Meghna' },
+      { className: '7', section: 'Beli' },
+      { className: '8', section: 'Jamuna' },
+      { className: '8', section: 'Gulap' },
+      { className: '9', section: 'Science' },
+      { className: '9', section: 'Commerce' },
+      { className: '9', section: 'Humanities' },
+      { className: '10', section: 'Science' },
+      { className: '10', section: 'Commerce' },
+      { className: '10', section: 'Humanities' }
+    ];
+  }
+
+  function getClassKey(className, section) {
+    return className + '||' + section;
+  }
+
+  // ============================================================
+  // PERSISTENCE LAYER (SQLite database file via Electron + manual backup/restore)
+  // ============================================================
+  let _persistTimer = null;
+
+  function collectStateForSave() {
+    return {
+      ACCOUNT_DATA, SIGNATURES, CLASS_SUBJECTS, CLASS_RECORDS,
+      CLASS_STATUS, templateSubjects,
+      savedAt: new Date().toISOString()
+    };
+  }
+
+  async function persistState() {
+    try {
+      const result = await window.electronAPI.saveState(collectStateForSave());
+      if (result && result.ok === false) {
+        console.error('Auto-save failed:', result.error);
+        alert('⚠️ ডেটা অটো-সেভ করতে সমস্যা হয়েছে। এখনই "💾 Backup Download" করে একটি ফাইল সেভ করে রাখুন, যাতে ডেটা হারিয়ে না যায়।');
+      }
+    } catch (e) {
+      console.error('Auto-save failed:', e);
+      alert('⚠️ ডেটা অটো-সেভ করতে সমস্যা হয়েছে। এখনই "💾 Backup Download" করে একটি ফাইল সেভ করে রাখুন, যাতে ডেটা হারিয়ে না যায়।');
+    }
+  }
+
+  // Debounced version for high-frequency events like typing marks,
+  // so we don't hammer the database on every keystroke.
+  function schedulePersist() {
+    clearTimeout(_persistTimer);
+    _persistTimer = setTimeout(persistState, 500);
+  }
+
+  function applyLoadedState(data) {
+    if (!data) return;
+    if (data.ACCOUNT_DATA) Object.assign(ACCOUNT_DATA, data.ACCOUNT_DATA);
+    if (data.SIGNATURES) SIGNATURES = data.SIGNATURES;
+    if (data.CLASS_SUBJECTS) CLASS_SUBJECTS = data.CLASS_SUBJECTS;
+    if (data.CLASS_RECORDS) CLASS_RECORDS = data.CLASS_RECORDS;
+    if (data.CLASS_STATUS) CLASS_STATUS = data.CLASS_STATUS;
+    if (data.templateSubjects) templateSubjects = data.templateSubjects;
+  }
+
+  async function loadState() {
+    try {
+      const data = await window.electronAPI.loadState();
+      if (!data) return false;
+      applyLoadedState(data);
+      return true;
+    } catch (e) {
+      console.error('Load failed:', e);
+      return false;
+    }
+  }
+
+  function exportBackup() {
+    const data = collectStateForSave();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const dateStr = new Date().toISOString().slice(0, 10);
+    a.download = 'report-card-backup-' + dateStr + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function triggerImportBackup() {
+    document.getElementById('backupFileInput').click();
+  }
+
+  function importBackup(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (!confirm('⚠️ এটি বর্তমান সব ডেটা মুছে ব্যাকআপ ফাইলের ডেটা দিয়ে প্রতিস্থাপন করবে। আপনি কি নিশ্চিত?')) {
+          event.target.value = '';
+          return;
+        }
+        applyLoadedState(data);
+        persistState();
+        renderDashboard();
+        alert('✅ ব্যাকআপ থেকে ডেটা সফলভাবে রিস্টোর হয়েছে!');
+      } catch (err) {
+        alert('❌ এটি সঠিক ব্যাকআপ ফাইল নয়। আবার চেষ্টা করুন।');
+      }
+      event.target.value = '';
+    };
+    reader.readAsText(file);
+  }
+
+  const host = document.getElementById('stageHost');
+  const progressEl = document.getElementById('progress');
+
+  setTimeout(() => {
+    document.getElementById('loadingPage').classList.add('hide');
+  }, 2500);
+
+  // ============================================================
+  // DASHBOARD
+  // ============================================================
+  function renderDashboard() {
+    if (progressEl) progressEl.style.display = 'none';
+    document.querySelector('.stage').classList.remove('wide');
+
+    const genClasses = getDefaultClasses('General');
+    const vocClasses = getDefaultClasses('Vocational');
+    
+    const logoHtml = ACCOUNT_DATA.logo ? 
+      `<img src="${ACCOUNT_DATA.logo}" alt="Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:30px;\\'>🏫</span>';">` : 
+      `<span style="font-size:30px;">🏫</span>`;
+
+    host.innerHTML = `
+      <div class="dash">
+        <div class="dash-head">
+          <div class="dash-logo" onclick="document.getElementById('logoUpload').click()" style="cursor:pointer;">
+            ${logoHtml}
+            <input type="file" id="logoUpload" accept="image/*" style="display:none;" onchange="uploadLogo(event)">
+          </div>
+          <div>
+            <div class="dash-name">${escapeHtml(ACCOUNT_DATA.name)}</div>
+            <span class="dash-badge">${escapeHtml(ACCOUNT_DATA.type)}</span>
+          </div>
+        </div>
+        <div class="dash-rows">
+          <div><b>Established:</b> ${escapeHtml(ACCOUNT_DATA.established)}</div>
+          <div><b>Address:</b> ${escapeHtml(ACCOUNT_DATA.address)}</div>
+          <div><b>EIIN:</b> ${escapeHtml(ACCOUNT_DATA.eiin)}</div>
+        </div>
+
+        <div class="card-grid">
+          <div class="card-box general" onclick="switchSchoolType('General')">
+            <span class="tag">📚</span>
+            <span class="big-icon">🏛️</span>
+            <h3>General</h3>
+            <div class="sub-line">Science · Commerce · Humanities</div>
+            <div class="chip">${genClasses.length} Classes</div>
+          </div>
+          <div class="card-box vocational" onclick="switchSchoolType('Vocational')">
+            <span class="tag">🔧</span>
+            <span class="big-icon">⚙️</span>
+            <h3>Vocational</h3>
+            <div class="sub-line">Civil · Electrical · Technical</div>
+            <div class="chip">${vocClasses.length} Classes</div>
+          </div>
+        </div>
+
+        <div class="action-grid">
+          <div class="action-card" onclick="goDesign()">
+            <span class="icon">✏️</span>
+            <h4>Design Report Card</h4>
+            <p>Create subjects & template</p>
+          </div>
+          <div class="action-card" onclick="goStudents()">
+            <span class="icon">👨‍🎓</span>
+            <h4>Students & Reports</h4>
+            <p>Data entry & reports</p>
+          </div>
+        </div>
+
+        <div class="action-grid" style="margin-top:14px;">
+          <div class="action-card" onclick="exportBackup()">
+            <span class="icon">💾</span>
+            <h4>Backup Download</h4>
+            <p>Save a data file to your device</p>
+          </div>
+          <div class="action-card" onclick="triggerImportBackup()">
+            <span class="icon">📂</span>
+            <h4>Restore Backup</h4>
+            <p>Load a previously saved backup</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function uploadLogo(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      ACCOUNT_DATA.logo = e.target.result;
+      persistState();
+      renderDashboard();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function switchSchoolType(type) {
+    ACCOUNT_DATA.type = type;
+    const classes = getDefaultClasses(type);
+    CLASS_RECORDS = classes.map((c, i) => ({
+      id: 'c_' + Date.now() + '_' + i,
+      className: c.className,
+      section: c.section,
+      group: '',
+      session: '2026',
+      exam: 'Annual Examination 2026',
+      shift: 'Morning',
+      students: []
+    }));
+    CLASS_RECORDS.forEach(r => {
+      const key = getClassKey(r.className, r.section);
+      CLASS_SUBJECTS[key] = templateSubjects.length ? templateSubjects.map(s => ({...s})) : DEFAULT_SUBJECTS.map(s => ({...s}));
+    });
+    persistState();
+    renderDashboard();
+  }
+
+  function topBackButton(label, action) {
+    return `
+      <div class="top-back">
+        <button class="btn-text" onclick="${action}">← ${label}</button>
+      </div>
+    `;
+  }
+
+  // ============================================================
+  // DESIGN SECTION
+  // ============================================================
+  function goDesign() {
+    document.querySelector('.stage').classList.add('wide');
+    renderDesignScreen();
+  }
+
+  function renderDesignScreen() {
+    const subList = templateSubjects.map((s, i) => {
+      const partsLbl = s.parts.map(k =>
+        `<span class="part-tag">${escapeHtml((PART_DEFS.find(p => p.key === k) || {}).label || k)}</span>`
+      ).join('');
+      const passEntries = Object.entries(s.passMarks || {}).filter(([, v]) => typeof v === 'number' && !isNaN(v));
+      const passLbl = passEntries.length ? ` · Pass: ${passEntries.map(([k, v]) => `${k.toUpperCase()}≥${v}`).join(', ')}` : '';
+      const warn = !s.parts.length ? `<div style="color:#a41f2b;font-size:10.5px;margin-top:3px;">⚠ No parts selected</div>` : '';
+      return `
+        <li style="align-items:flex-start;">
+          <span>${i+1}. ${escapeHtml(s.name)} — Full: ${s.full}${partsLbl?' · '+partsLbl:''}${passLbl}${warn}</span>
+          <span style="display:flex;gap:6px;flex-shrink:0;">
+            <button class="del" style="color:#ad8a4e;" onclick="editSubject(${i})">✎</button>
+            <button class="del" onclick="removeSubject(${i})">×</button>
+          </span>
+        </li>`;
+    }).join('');
+
+    const available = DEFAULT_SUBJECTS.filter(d => !templateSubjects.some(t => t.name === d.name));
+    const suggestHtml = available.length ? `
+      <div style="margin-bottom:12px;">
+        <div style="font-size:12px;color:#6b6455;margin-bottom:6px;">💡 Suggestions (Click to add):</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          ${available.map(s => `<span class="suggest-chip" onclick="addDefaultSubject('${escapeAttr(s.name)}')">${escapeHtml(s.name)}</span>`).join('')}
+        </div>
+      </div>
+    ` : '';
+
+    host.innerHTML = `
+      <div class="builder">
+        ${topBackButton('Back to Dashboard', 'backToDashboard()')}
+        <h2>Global Subjects (applies to all classes)</h2>
+        <p class="sub">Add subjects that will be used for all classes. You can also add class-specific subjects later.</p>
+        ${suggestHtml}
+        <div class="form-row">
+          <input type="text" id="in_subName" placeholder="Subject Name">
+          <input type="number" id="in_subFull" placeholder="Full Marks" value="100">
+        </div>
+        <div class="parts-row" id="partsRow">
+          ${PART_DEFS.map(p=>`<div class="part-choice ${currentParts.includes(p.key)?'picked':''}" data-part="${p.key}" onclick="togglePart('${p.key}')">${p.label}</div>`).join('')}
+        </div>
+        <div class="passmarks-row" id="passMarksRow"></div>
+        <button class="btn btn-primary" style="margin-top:0;" onclick="addSubject()">+ Add Subject</button>
+        <ul class="added-list" id="addedList" style="margin-top:16px;">
+          ${subList || '<li style="color:#6b6455;text-align:center;justify-content:center;">No subjects added yet</li>'}
+        </ul>
+        <button class="btn btn-primary" onclick="saveGlobalTemplate()">Save Global Template</button>
+      </div>
+    `;
+    renderPassMarksRow();
+  }
+
+  function addDefaultSubject(name) {
+    const sub = DEFAULT_SUBJECTS.find(s => s.name === name);
+    if (!sub) return;
+    if (templateSubjects.some(t => t.name === name)) return;
+    templateSubjects.push({...sub});
+    renderDesignScreen();
+  }
+
+  function togglePart(key) {
+    const idx = currentParts.indexOf(key);
+    if (idx > -1) { currentParts.splice(idx, 1); delete currentPassMarks[key]; } else currentParts.push(key);
+    document.querySelectorAll('#partsRow .part-choice').forEach(el => {
+      el.classList.toggle('picked', currentParts.includes(el.dataset.part));
+    });
+    renderPassMarksRow();
+  }
+
+  function renderPassMarksRow() {
+    const el = document.getElementById('passMarksRow');
+    if (!el) return;
+    const relevant = PASSABLE_PARTS.filter(k => currentParts.includes(k));
+    if (!relevant.length) { el.innerHTML = ''; return; }
+    el.innerHTML = `<div class="lbl">Minimum pass marks for each part (optional)</div>` +
+      `<div class="passmarks-grid">` +
+      relevant.map(k => `
+        <div class="passmark-item">
+          <span>${(PART_DEFS.find(p=>p.key===k)||{}).label||k.toUpperCase()}</span>
+          <input type="number" value="${currentPassMarks[k]??''}" placeholder="Pass marks" oninput="currentPassMarks['${k}']=this.value===''?undefined:parseFloat(this.value)">
+        </div>`).join('') +
+      `</div>`;
+  }
+
+  function addSubject() {
+    const nameInput = document.getElementById('in_subName');
+    const fullInput = document.getElementById('in_subFull');
+    if (!nameInput || !fullInput) return;
+    const name = nameInput.value.trim();
+    const full = parseFloat(fullInput.value) || 0;
+    if (!name) { alert('Enter subject name'); return; }
+    if (!currentParts.length) { alert('Select at least one part'); return; }
+    const passMarks = {};
+    PASSABLE_PARTS.forEach(k => {
+      if (currentParts.includes(k) && typeof currentPassMarks[k] === 'number' && !isNaN(currentPassMarks[k]))
+        passMarks[k] = currentPassMarks[k];
+    });
+    templateSubjects.push({ name, full, parts: [...currentParts], passMarks });
+    currentParts = [];
+    currentPassMarks = {};
+    renderDesignScreen();
+  }
+
+  function removeSubject(i) {
+    templateSubjects.splice(i, 1);
+    renderDesignScreen();
+  }
+
+  function editSubject(i) {
+    const s = templateSubjects[i];
+    templateSubjects.splice(i, 1);
+    currentParts = [...s.parts];
+    currentPassMarks = { ...(s.passMarks || {}) };
+    renderDesignScreen();
+    const nameInput = document.getElementById('in_subName');
+    const fullInput = document.getElementById('in_subFull');
+    if (nameInput) nameInput.value = s.name;
+    if (fullInput) fullInput.value = s.full;
+    document.querySelectorAll('#partsRow .part-choice').forEach(el => {
+      el.classList.toggle('picked', currentParts.includes(el.dataset.part));
+    });
+    renderPassMarksRow();
+    if (nameInput) nameInput.focus();
+  }
+
+  function saveGlobalTemplate() {
+    if (!templateSubjects.length) { alert('Add at least one subject'); return; }
+    persistState();
+    alert('Global template saved successfully!');
+    renderDesignScreen();
+  }
+
+  function backToDashboard() {
+    document.querySelector('.stage').classList.remove('wide');
+    renderDashboard();
+  }
+
+  // ============================================================
+  // STUDENTS & REPORTS SECTION
+  // ============================================================
+  function goStudents() {
+    if (CLASS_RECORDS.length === 0) {
+      const classes = getDefaultClasses(ACCOUNT_DATA.type);
+      CLASS_RECORDS = classes.map((c, i) => ({
+        id: 'c_' + Date.now() + '_' + i,
+        className: c.className,
+        section: c.section,
+        group: '',
+        session: '2026',
+        exam: 'Annual Examination 2026',
+        shift: 'Morning',
+        students: []
+      }));
+      CLASS_RECORDS.forEach(r => {
+        const key = getClassKey(r.className, r.section);
+        CLASS_SUBJECTS[key] = templateSubjects.length ? templateSubjects.map(s => ({...s})) : DEFAULT_SUBJECTS.map(s => ({...s}));
+      });
+    }
+    document.querySelector('.stage').classList.add('wide');
+    renderClassListScreen();
+  }
+
+  function renderClassListScreen() {
+    const listHtml = CLASS_RECORDS.length ? CLASS_RECORDS.map((r, i) => `
+      <li class="class-item" onclick="openClass(${i})">
+        <div>
+          <div class="ci-name">${escapeHtml(r.className)} — ${escapeHtml(r.section||'-')}</div>
+          <div class="ci-sub">${escapeHtml(r.exam||'Annual Examination 2026')} · ${r.students?r.students.length:0} students</div>
+        </div>
+        <span class="ci-arrow">→</span>
+      </li>`).join('') : `<div class="empty-note">No classes added yet</div>`;
+
+    host.innerHTML = `
+      <div class="builder">
+        ${topBackButton('Back to Dashboard', 'backToDashboard()')}
+        <h2>Classes & Students</h2>
+        <p class="sub">Select a class to manage students, subjects, and marks</p>
+        <ul class="class-list">${listHtml}</ul>
+        <button class="btn btn-primary" onclick="renderClassMetaForm()">+ Add New Class</button>
+      </div>
+    `;
+  }
+
+  function renderClassMetaForm() {
+    host.innerHTML = `
+      <div class="builder">
+        ${topBackButton('Back to Class List', 'renderClassListScreen()')}
+        <h2>New Class</h2>
+        <p class="sub">Enter class details</p>
+        <div class="sheet-meta">
+          <input type="text" id="cm_class" placeholder="Class (e.g., 9)">
+          <input type="text" id="cm_section" placeholder="Section (e.g., Science)">
+          <input type="text" id="cm_group" placeholder="Group (optional)">
+          <input type="text" id="cm_session" placeholder="Session (e.g., 2026)">
+          <input type="text" id="cm_exam" placeholder="Exam Name" style="grid-column:1/-1;" value="Annual Examination 2026">
+          <select id="cm_shift" style="grid-column:1/-1;padding:10px 14px;border:1px solid #d8cfb8;border-radius:8px;font-size:14px;font-family:inherit;background:#fbf9f3;">
+            <option value="Morning">Morning</option>
+            <option value="Day">Day</option>
+            <option value="Evening">Evening</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="createClass()">Create & Continue</button>
+      </div>
+    `;
+    const inp = document.getElementById('cm_class');
+    if (inp) inp.focus();
+  }
+
+  function createClass() {
+    const classNameInput = document.getElementById('cm_class');
+    if (!classNameInput) return;
+    const className = classNameInput.value.trim();
+    if (!className) { alert('Enter class name'); return; }
+    const section = document.getElementById('cm_section').value.trim() || 'A';
+    const record = {
+      id: 'c_' + Date.now(),
+      className,
+      section,
+      group: document.getElementById('cm_group').value.trim(),
+      session: document.getElementById('cm_session').value.trim() || '2026',
+      exam: document.getElementById('cm_exam').value.trim() || 'Annual Examination 2026',
+      shift: document.getElementById('cm_shift').value || 'Morning',
+      students: []
+    };
+    CLASS_RECORDS.push(record);
+    const key = getClassKey(className, section);
+    CLASS_SUBJECTS[key] = templateSubjects.length ? templateSubjects.map(s => ({...s})) : DEFAULT_SUBJECTS.map(s => ({...s}));
+    currentRecord = record;
+    persistState();
+    renderClassSubjectManager(record);
+  }
+
+  function openClass(i) {
+    currentRecord = CLASS_RECORDS[i];
+    renderClassSubjectManager(currentRecord);
+  }
+
+  function renderClassSubjectManager(record) {
+    const key = getClassKey(record.className, record.section);
+    const subjects = CLASS_SUBJECTS[key] || [];
+
+    const subList = subjects.map((s, i) => {
+      const partsLbl = s.parts.map(k =>
+        `<span class="part-tag">${escapeHtml((PART_DEFS.find(p => p.key === k) || {}).label || k)}</span>`
+      ).join('');
+      const passEntries = Object.entries(s.passMarks || {}).filter(([, v]) => typeof v === 'number' && !isNaN(v));
+      const passLbl = passEntries.length ? ` · Pass: ${passEntries.map(([k, v]) => `${k.toUpperCase()}≥${v}`).join(', ')}` : '';
+      return `
+      <div class="sub-item">
+        <span>${i+1}. ${escapeHtml(s.name)} — Full: ${s.full} ${partsLbl}${passLbl}</span>
+        <span><span class="sub-del" onclick="removeClassSubject('${key}',${i})">×</span></span>
+      </div>`;
+    }).join('');
+
+    const statusKey = getClassKey(record.className, record.section);
+    const status = CLASS_STATUS[statusKey] || { sectionPosition: '', gpaWithout4th: '', workingDays: '', totalPresent: '' };
+
+    if (record.students) {
+      record.students.forEach(st => {
+        if (!st.totalPresent && st.totalPresent !== 0) {
+          st.totalPresent = '';
+        }
+      });
+    }
+
+    host.innerHTML = `
+      <div class="builder">
+        ${topBackButton('Back to Class List', 'renderClassListScreen()')}
+        <h2>${escapeHtml(record.className)} — ${escapeHtml(record.section||'-')}</h2>
+        <p class="sub">Manage subjects for this class. Global subjects are pre-loaded.</p>
+        
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+          <label style="font-size:12px;font-weight:600;color:#6b6455;">Exam Name:</label>
+          <input type="text" id="classExamName" value="${escapeAttr(record.exam||'Annual Examination 2026')}" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid #d8cfb8;border-radius:6px;font-size:13px;background:#fbf9f3;">
+          <button class="btn btn-primary" style="width:auto;padding:8px 20px;margin:0;" onclick="updateExamName()">Update</button>
+        </div>
+        
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+          <label style="font-size:12px;font-weight:600;color:#6b6455;">Shift:</label>
+          <select id="classShift" style="padding:8px 12px;border:1px solid #d8cfb8;border-radius:6px;font-size:13px;background:#fbf9f3;font-family:inherit;">
+            <option value="Morning" ${record.shift==='Morning'?'selected':''}>Morning</option>
+            <option value="Day" ${record.shift==='Day'?'selected':''}>Day</option>
+            <option value="Evening" ${record.shift==='Evening'?'selected':''}>Evening</option>
+          </select>
+          <button class="btn btn-primary" style="width:auto;padding:8px 20px;margin:0;" onclick="updateShift()">Update Shift</button>
+        </div>
+        
+        <div class="status-input-row">
+          <div><label>Section Position (Auto Calculated)</label><input type="text" id="status_position" value="${escapeAttr(status.sectionPosition)}" readonly style="background:#eee;cursor:not-allowed;"></div>
+          <div><label>GPA [Without 4th] (Auto Calculated)</label><input type="text" id="status_gpa" value="${escapeAttr(status.gpaWithout4th)}" readonly style="background:#eee;cursor:not-allowed;"></div>
+          <div><label>Working Days</label><input type="number" id="status_days" value="${escapeAttr(status.workingDays)}" placeholder="e.g., 220"></div>
+          <div><label>Total Present (Per Student)</label><span style="font-size:11px;color:#6b6455;">Enter in marks sheet</span></div>
+        </div>
+        <button class="btn btn-primary" style="width:auto;padding:8px 20px;margin:0 0 12px 0;" onclick="saveStatus()">Save Status</button>
+        
+        <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+          <button class="btn btn-primary" style="width:auto;padding:8px 20px;margin:0;" onclick="renderAddClassSubject('${key}')">+ Add Subject</button>
+          <button class="btn btn-primary" style="width:auto;padding:8px 20px;margin:0;background:#ad8a4e;" onclick="goToMarksEntry()">📝 Enter Marks</button>
+        </div>
+        
+        <div class="subject-list-wrap">
+          ${subList || '<div style="color:#6b6455;text-align:center;padding:10px;">No subjects added. Add from global template or add new.</div>'}
+        </div>
+      </div>
+    `;
+  }
+
+  function updateShift() {
+    if (!currentRecord) return;
+    const shiftSelect = document.getElementById('classShift');
+    if (!shiftSelect) return;
+    currentRecord.shift = shiftSelect.value;
+    alert('Shift updated to: ' + currentRecord.shift);
+  }
+
+  function saveStatus() {
+    if (!currentRecord) return;
+    const key = getClassKey(currentRecord.className, currentRecord.section);
+    if (!CLASS_STATUS[key]) CLASS_STATUS[key] = {};
+    CLASS_STATUS[key].workingDays = document.getElementById('status_days').value.trim();
+    persistState();
+    alert('✅ Status saved successfully!');
+  }
+
+  function updateExamName() {
+    const input = document.getElementById('classExamName');
+    if (!input || !currentRecord) return;
+    currentRecord.exam = input.value.trim() || 'Annual Examination 2026';
+    persistState();
+    alert('Exam name updated!');
+  }
+
+  function renderAddClassSubject(key) {
+    const globalSubjects = templateSubjects.map(s => s.name);
+    const existing = CLASS_SUBJECTS[key] || [];
+    const available = globalSubjects.filter(n => !existing.some(e => e.name === n));
+    const defaultAvailable = DEFAULT_SUBJECTS.filter(d => !existing.some(e => e.name === d.name) && !globalSubjects.some(g => g === d.name));
+
+    let suggestionsHtml = '';
+    if (available.length || defaultAvailable.length) {
+      suggestionsHtml = `<div style="margin-bottom:10px;">
+        <div style="font-size:12px;color:#6b6455;margin-bottom:4px;">💡 Suggestions:</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          ${available.map(n => `<span class="suggest-chip" onclick="addGlobalSubjectToClass('${key}','${escapeAttr(n)}')">${escapeHtml(n)}</span>`).join('')}
+          ${defaultAvailable.map(d => `<span class="suggest-chip" onclick="addDefaultSubjectToClass('${key}','${escapeAttr(d.name)}')">${escapeHtml(d.name)}</span>`).join('')}
+        </div>
+      </div>`;
+    }
+
+    const builder = document.querySelector('.builder');
+    const panel = document.createElement('div');
+    panel.id = 'addSubPanel';
+    panel.style.cssText = 'margin-top:12px;padding:16px;border:1px solid #d8cfb8;border-radius:10px;background:#fbf9f3;';
+    panel.innerHTML = `
+      <h3 style="font-size:13px;margin:0 0 8px;">Add New Subject</h3>
+      ${suggestionsHtml}
+      <div class="form-row" style="grid-template-columns:2fr 1fr auto;gap:8px;">
+        <input type="text" id="newSubName" placeholder="Subject Name">
+        <input type="number" id="newSubFull" placeholder="Full Marks" value="100">
+        <button class="btn btn-primary" style="width:auto;padding:8px 16px;margin:0;" onclick="addCustomClassSubject('${key}')">Add</button>
+      </div>
+      <div class="parts-row" id="classPartsRow">
+        ${PART_DEFS.map(p=>`<div class="part-choice" data-part="${p.key}" onclick="toggleClassPart('${p.key}')">${p.label}</div>`).join('')}
+      </div>
+      <div class="passmarks-row" id="classPassMarksRow"></div>
+      <button class="btn-text" style="margin-top:8px;" onclick="closeAddSubjectPanel()">✕ Close</button>
+    `;
+    builder.appendChild(panel);
+    renderClassPassMarksRow();
+  }
+
+  function renderClassPassMarksRow() {
+    const el = document.getElementById('classPassMarksRow');
+    if (!el) return;
+    const relevant = PASSABLE_PARTS.filter(k => classCurrentParts.includes(k));
+    if (!relevant.length) { el.innerHTML = ''; return; }
+    el.innerHTML = `<div class="lbl">Minimum pass marks for each part (optional)</div>` +
+      `<div class="passmarks-grid">` +
+      relevant.map(k => `
+        <div class="passmark-item">
+          <span>${(PART_DEFS.find(p=>p.key===k)||{}).label||k.toUpperCase()}</span>
+          <input type="number" value="${classCurrentPassMarks[k]??''}" placeholder="Pass marks" oninput="classCurrentPassMarks['${k}']=this.value===''?undefined:parseFloat(this.value)">
+        </div>`).join('') +
+      `</div>`;
+  }
+
+  function toggleClassPart(key) {
+    const idx = classCurrentParts.indexOf(key);
+    if (idx > -1) { classCurrentParts.splice(idx, 1); delete classCurrentPassMarks[key]; } else classCurrentParts.push(key);
+    document.querySelectorAll('#classPartsRow .part-choice').forEach(el => {
+      el.classList.toggle('picked', classCurrentParts.includes(el.dataset.part));
+    });
+    renderClassPassMarksRow();
+  }
+
+  function addDefaultSubjectToClass(key, name) {
+    const sub = DEFAULT_SUBJECTS.find(s => s.name === name);
+    if (!sub) return;
+    if (!CLASS_SUBJECTS[key]) CLASS_SUBJECTS[key] = [];
+    if (CLASS_SUBJECTS[key].some(s => s.name === name)) return;
+    CLASS_SUBJECTS[key].push({...sub});
+    persistState();
+    closeAddSubjectPanel();
+    renderClassSubjectManager(currentRecord);
+  }
+
+  function addGlobalSubjectToClass(key, name) {
+    const globalSub = templateSubjects.find(s => s.name === name);
+    if (!globalSub) return;
+    if (!CLASS_SUBJECTS[key]) CLASS_SUBJECTS[key] = [];
+    CLASS_SUBJECTS[key].push({...globalSub});
+    persistState();
+    closeAddSubjectPanel();
+    renderClassSubjectManager(currentRecord);
+  }
+
+  function addCustomClassSubject(key) {
+    const nameInput = document.getElementById('newSubName');
+    const fullInput = document.getElementById('newSubFull');
+    if (!nameInput || !fullInput) return;
+    const name = nameInput.value.trim();
+    const full = parseFloat(fullInput.value) || 0;
+    if (!name) { alert('Enter subject name'); return; }
+    if (!classCurrentParts.length) { alert('Select at least one part'); return; }
+    const passMarks = {};
+    PASSABLE_PARTS.forEach(k => {
+      if (classCurrentParts.includes(k) && typeof classCurrentPassMarks[k] === 'number' && !isNaN(classCurrentPassMarks[k]))
+        passMarks[k] = classCurrentPassMarks[k];
+    });
+    if (!CLASS_SUBJECTS[key]) CLASS_SUBJECTS[key] = [];
+    CLASS_SUBJECTS[key].push({ name, full, parts: [...classCurrentParts], passMarks });
+    classCurrentParts = [];
+    classCurrentPassMarks = {};
+    persistState();
+    closeAddSubjectPanel();
+    renderClassSubjectManager(currentRecord);
+  }
+
+  function removeClassSubject(key, index) {
+    if (!CLASS_SUBJECTS[key]) return;
+    CLASS_SUBJECTS[key].splice(index, 1);
+    persistState();
+    renderClassSubjectManager(currentRecord);
+  }
+
+  function closeAddSubjectPanel() {
+    const panel = document.getElementById('addSubPanel');
+    if (panel) panel.remove();
+  }
+
+  function goToMarksEntry() {
+    if (!currentRecord) return;
+    const key = getClassKey(currentRecord.className, currentRecord.section);
+    const subjects = CLASS_SUBJECTS[key] || [];
+    if (!subjects.length) {
+      alert('Add subjects first!');
+      return;
+    }
+    renderSpreadsheet(currentRecord);
+  }
+
+  function renderSpreadsheet(record) {
+    const key = getClassKey(record.className, record.section);
+    const subjects = CLASS_SUBJECTS[key] || [];
+
+    const subjHeadRow = subjects.map(s => {
+      const cols = subjectColumnKeys(s);
+      return `<th colspan="${cols.length}">${escapeHtml(s.name)}<br><span style="font-weight:400;">(Full ${s.full})</span></th>`;
+    }).join('');
+    const subjSubHeadRow = subjects.map(s => {
+      const cols = subjectColumnKeys(s);
+      return cols.map(c => `<th>${PART_LABELS[c]}</th>`).join('');
+    }).join('');
+
+    const rows = (record.students || []).map((st, i) => `
+      <tr>
+        <td><input type="text" value="${escapeAttr(st.roll)}" oninput="updateStudent(${i},'roll',this.value)"></td>
+        <td class="nm"><input type="text" value="${escapeAttr(st.name)}" oninput="updateStudent(${i},'name',this.value)"></td>
+        ${subjects.map(s=>{
+          const cols = subjectColumnKeys(s);
+          const m = (st.marks && st.marks[s.name]) || {};
+          return cols.map(c=>`<td><input type="number" value="${m[c]??''}" oninput="updateMark(${i},${escapeAttr(JSON.stringify(s.name))},'${c}',this.value)"></td>`).join('');
+        }).join('')}
+        <td><input type="number" value="${escapeAttr(st.totalPresent??'')}" oninput="updateStudent(${i},'totalPresent',this.value)" style="width:60px;min-width:40px;"></td>
+        <td><button class="rowdel" onclick="deleteStudent(${i})">×</button></td>
+      </tr>`).join('');
+
+    const totalCols = subjects.reduce((n, s) => n + subjectColumnKeys(s).length, 0);
+
+    host.innerHTML = `
+      <div class="builder">
+        ${topBackButton('Back to Class', 'renderClassSubjectManager(currentRecord)')}
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+          <h2 style="margin:0;">${escapeHtml(record.className)} — ${escapeHtml(record.section||'-')}</h2>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-text" style="margin:0;" onclick="renderSignatureEditor()">✎ Signatures</button>
+          </div>
+        </div>
+        <p class="sub">Enter roll, name, and marks for each student. Total Present per student is individual.</p>
+        <div class="sheet-wrap">
+          <table class="sheet">
+            <thead>
+              <tr><th rowspan="2">Roll</th><th rowspan="2">Name</th>${subjHeadRow}<th rowspan="2">Total Present</th><th rowspan="2"></th></tr>
+              <tr>${subjSubHeadRow}</tr>
+            </thead>
+            <tbody id="sheetBody">${rows || `<tr><td colspan="${2+totalCols+2}" class="empty-note">No students added yet</td></tr>`}</tbody>
+          </table>
+        </div>
+        <div class="sheet-actions">
+          <button class="btn btn-outline" onclick="addStudentRow()">+ Add Student</button>
+          <button class="btn btn-primary" onclick="saveMarks()">💾 Save Marks</button>
+        </div>
+        <button class="btn btn-gold" style="width:100%;margin-top:10px;" onclick="createReports()">📄 Create Reports</button>
+      </div>
+    `;
+  }
+
+  function addStudentRow() {
+    if (!currentRecord) return;
+    if (!currentRecord.students) currentRecord.students = [];
+    currentRecord.students.push({ roll: '', name: '', marks: {}, totalPresent: '' });
+    persistState();
+    renderSpreadsheet(currentRecord);
+  }
+
+  function updateStudent(i, field, val) {
+    if (!currentRecord || !currentRecord.students[i]) return;
+    currentRecord.students[i][field] = val;
+    schedulePersist();
+  }
+
+  function updateMark(i, subjectName, key, val) {
+    if (!currentRecord || !currentRecord.students || !currentRecord.students[i]) return;
+    const st = currentRecord.students[i];
+    if (!st.marks) st.marks = {};
+    if (!st.marks[subjectName]) st.marks[subjectName] = {};
+    if (val === '' || val === null || val === undefined) {
+      delete st.marks[subjectName][key];
+    } else {
+      const num = parseFloat(val);
+      if (!isNaN(num)) {
+        st.marks[subjectName][key] = num;
+      } else {
+        delete st.marks[subjectName][key];
+      }
+    }
+    schedulePersist();
+  }
+
+  function deleteStudent(i) {
+    if (!currentRecord || !currentRecord.students) return;
+    currentRecord.students.splice(i, 1);
+    persistState();
+    renderSpreadsheet(currentRecord);
+  }
+
+  function saveMarks() {
+    if (currentRecord && currentRecord.students) {
+      const key = getClassKey(currentRecord.className, currentRecord.section);
+      const subjects = CLASS_SUBJECTS[key] || [];
+      
+      const studentsWithMarks = currentRecord.students.filter(st => st.name && st.name.trim());
+      const studentData = studentsWithMarks.map(st => {
+        let totalObt = 0, totalFull = 0;
+        let hasFailed = false;
+        subjects.forEach(s => {
+          const obt = subjectTotal(st, s);
+          if (obt !== null) {
+            totalObt += obt;
+            totalFull += s.full || 0;
+            if (subjectFailed(st, s)) hasFailed = true;
+          }
+        });
+        const pct = totalFull ? (totalObt / totalFull * 100) : 0;
+        const grade = gradeFromPercent(pct);
+        return { student: st, totalObt, totalFull, pct, gpa: grade.point, hasFailed };
+      });
+      
+      const passedStudents = studentData.filter(d => !d.hasFailed);
+      const failedStudents = studentData.filter(d => d.hasFailed);
+      
+      passedStudents.sort((a, b) => b.pct - a.pct);
+      
+      let position = 1;
+      passedStudents.forEach((data, index) => {
+        if (index > 0 && data.pct < passedStudents[index-1].pct) {
+          position = index + 1;
+        }
+        data.student.sectionPosition = position;
+      });
+      
+      failedStudents.forEach(data => {
+        data.student.sectionPosition = '—';
+      });
+      
+      // Calculate GPA Without 4th
+      let totalGPA = 0;
+      let count = 0;
+      studentData.forEach(data => {
+        const st = data.student;
+        const hasAgri = subjects.some(s => s.name === 'Agricultural Education' && subjectTotal(st, s) !== null);
+        const hasHigherMath = subjects.some(s => s.name === 'Higher Mathematics' && subjectTotal(st, s) !== null);
+        
+        if (hasAgri || hasHigherMath) {
+          let gpaTotal = 0;
+          let gpaCount = 0;
+          subjects.forEach(s => {
+            const obt = subjectTotal(st, s);
+            if (obt !== null) {
+              const pct = (obt / (s.full || 100)) * 100;
+              const grade = gradeFromPercent(pct);
+              gpaTotal += grade.point;
+              gpaCount++;
+            }
+          });
+          if (gpaCount > 0) {
+            const avgGPA = gpaTotal / gpaCount;
+            st.gpaWithout4th = avgGPA;
+            totalGPA += avgGPA;
+            count++;
+          }
+        }
+      });
+      
+      if (count > 0) {
+        const avgGPA = totalGPA / count;
+        CLASS_STATUS[key].gpaWithout4th = avgGPA.toFixed(2);
+        const gpaInput = document.getElementById('status_gpa');
+        if (gpaInput) gpaInput.value = avgGPA.toFixed(2);
+      }
+      
+      const positionStr = passedStudents.map((data, i) => {
+        const pos = data.student.sectionPosition;
+        const suffix = pos === 1 ? 'st' : pos === 2 ? 'nd' : pos === 3 ? 'rd' : 'th';
+        return `${data.student.name}: ${pos}${suffix}`;
+      }).join(', ');
+      CLASS_STATUS[key].sectionPosition = positionStr || '—';
+      
+      const posInput = document.getElementById('status_position');
+      if (posInput) posInput.value = positionStr || '—';
+    }
+    persistState();
+    alert('✅ Marks saved successfully! Section Position and GPA auto-calculated!');
+  }
+
+  // ============================================================
+  // SIGNATURE EDITOR
+  // ============================================================
+  function renderSignatureEditor() {
+    const existing = document.getElementById('sigEditor');
+    if (existing) existing.remove();
+
+    const editor = document.createElement('div');
+    editor.id = 'sigEditor';
+    editor.className = 'sig-edit-area';
+    editor.innerHTML = `
+      <div class="sig-row">
+        <div class="sig-item">
+          <label>📋 Principal</label>
+          ${SIGNATURES.principal.image ? `<img class="sig-img-preview" src="${SIGNATURES.principal.image}">` : `<div class="sig-img-preview" style="display:flex;align-items:center;justify-content:center;color:#999;font-size:10px;">No Image</div>`}
+          <input type="file" accept="image/*" onchange="uploadSigImage('principal', this)" style="font-size:10px;padding:4px;">
+          <input type="text" id="sig_principal" value="${escapeAttr(SIGNATURES.principal.name)}" placeholder="Principal Name">
+        </div>
+        <div class="sig-item">
+          <label>📋 Class Teacher</label>
+          ${SIGNATURES.classTeacher.image ? `<img class="sig-img-preview" src="${SIGNATURES.classTeacher.image}">` : `<div class="sig-img-preview" style="display:flex;align-items:center;justify-content:center;color:#999;font-size:10px;">No Image</div>`}
+          <input type="file" accept="image/*" onchange="uploadSigImage('classTeacher', this)" style="font-size:10px;padding:4px;">
+          <input type="text" id="sig_teacher" value="${escapeAttr(SIGNATURES.classTeacher.name)}" placeholder="Class Teacher Name">
+        </div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:10px;" onclick="saveSignatures()">Save Signatures</button>
+      <button class="btn-text" style="margin-top:6px;" onclick="closeSignatureEditor()">✕ Close</button>
+    `;
+
+    const builder = document.querySelector('.builder');
+    if (builder) {
+      const h2 = builder.querySelector('h2');
+      if (h2) {
+        h2.parentNode.insertBefore(editor, h2.nextSibling);
+      } else {
+        builder.prepend(editor);
+      }
+    }
+  }
+
+  function uploadSigImage(role, input) {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      SIGNATURES[role].image = e.target.result;
+      persistState();
+      renderSignatureEditor();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function saveSignatures() {
+    const p = document.getElementById('sig_principal');
+    const t = document.getElementById('sig_teacher');
+    if (p) SIGNATURES.principal.name = p.value.trim();
+    if (t) SIGNATURES.classTeacher.name = t.value.trim();
+    persistState();
+    alert('✅ Signatures saved successfully!');
+    closeSignatureEditor();
+  }
+
+  function closeSignatureEditor() {
+    const el = document.getElementById('sigEditor');
+    if (el) el.remove();
+  }
+
+  // ============================================================
+  // REPORTS
+  // ============================================================
+  function createReports() {
+    if (!currentRecord) return;
+    const named = (currentRecord.students || []).filter(s => s.name && s.name.trim());
+    if (!named.length) {
+      alert('⚠️ Add at least one student with name');
+      return;
+    }
+    renderCreateOptions(currentRecord);
+  }
+
+  function renderCreateOptions(record) {
+    host.innerHTML = `
+      <div class="builder">
+        ${topBackButton('Back to Marks Sheet', 'goToMarksEntry()')}
+        <h2>${escapeHtml(record.className)} — ${escapeHtml(record.section||'-')}</h2>
+        <p class="sub">${record.students?record.students.length:0} students data available. Choose an option below.</p>
+        
+        <div style="background:#dcfce7;padding:10px 14px;border-radius:8px;margin-bottom:14px;font-size:12px;color:#166534;">
+          ✅ Data saved. You can come back anytime.
+        </div>
+        
+        <div class="opt-cards">
+          <div class="opt-card" onclick="renderAllReports()">
+            <div class="oc-icon">📄</div>
+            <div>
+              <p class="oc-title">View All Report Cards</p>
+              <p class="oc-sub">All students' report cards together (Roll wise)</p>
+            </div>
+          </div>
+          <div class="opt-card" onclick="renderClassReport()">
+            <div class="oc-icon">📊</div>
+            <div>
+              <p class="oc-title">View Class Report</p>
+              <p class="oc-sub">Full class list with names, rolls, and marks</p>
+            </div>
+          </div>
+        </div>
+        
+        <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
+          <button class="btn btn-outline" style="flex:1;" onclick="renderSpreadsheet(currentRecord)">✏️ Edit Data</button>
+          <button class="btn btn-outline" style="flex:1;background:#eee;color:#333;border-color:#ccc;" onclick="renderClassListScreen()">← Back to Classes</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderAllReports() {
+    const record = currentRecord;
+    if (!record) return;
+    const key = getClassKey(record.className, record.section);
+    const subjects = CLASS_SUBJECTS[key] || [];
+
+    const named = (record.students || []).filter(s => s.name && s.name.trim());
+    const cardsHtml = named.map((st, i) => `
+      <div style="margin-bottom:40px;page-break-after:always;">
+        ${buildTemplateCardHTML(record, st, subjects)}
+      </div>
+    `).join('');
+
+    host.innerHTML = `
+      <div class="builder no-print">
+        ${topBackButton('Back to Report Options', 'renderCreateOptions(currentRecord)')}
+        <h2>${escapeHtml(record.className)} — ${escapeHtml(record.section||'-')}</h2>
+        <p class="sub">All students' report cards (Roll wise)</p>
+        <div class="sheet-actions">
+          <button class="btn btn-primary" onclick="window.print()">Print / Download PDF</button>
+        </div>
+      </div>
+      <div id="printArea">${cardsHtml}</div>
+    `;
+  }
+
+  function renderClassReport() {
+    const record = currentRecord;
+    if (!record) return;
+    const key = getClassKey(record.className, record.section);
+    const subjects = CLASS_SUBJECTS[key] || [];
+
+    const named = (record.students || []).filter(s => s.name && s.name.trim());
+    const rowsHtml = named.map(st => {
+      let totalObt = 0, totalFull = 0, failed = false;
+      const marksCells = subjects.map(sub => {
+        const obt = subjectTotal(st, sub);
+        const full = sub.full || 0;
+        totalFull += full;
+        if (obt !== null) {
+          totalObt += obt;
+          if (subjectFailed(st, sub)) failed = true;
+          return `<td>${obt}</td>`;
+        }
+        return `<td class="dim">—</td>`;
+      }).join('');
+      const overallPct = totalFull ? (totalObt / totalFull * 100) : 0;
+      const overallGrade = gradeFromPercent(overallPct);
+      const gpa = overallGrade ? overallGrade.point : 0;
+      return `<tr>
+        <td class="nm">${escapeHtml(st.name)}</td>
+        <td>${escapeHtml(st.roll||'-')}</td>
+        ${marksCells}
+        <td>${totalObt}</td>
+        <td>${overallGrade.letter}</td>
+        <td>${gpa.toFixed(2)}</td>
+        <td class="${failed?'res-fail':'res-pass'}">${failed?'Failed':'Passed'}</td>
+        <td>${escapeHtml(st.totalPresent??'—')}</td>
+        <td>${escapeHtml(st.sectionPosition || '—')}</td>
+      </tr>`;
+    }).join('');
+
+    host.innerHTML = `
+      <div class="builder no-print">
+        ${topBackButton('Back to Report Options', 'renderCreateOptions(currentRecord)')}
+        <h2>${escapeHtml(record.className)} — ${escapeHtml(record.section||'-')} · Class Report</h2>
+        <div class="sheet-actions">
+          <button class="btn btn-primary" onclick="window.print()">Print / Download PDF</button>
+        </div>
+      </div>
+      <div id="printArea">
+        <table class="classrep">
+          <thead><tr><th>Name</th><th>Roll</th>${subjects.map(s=>`<th>${escapeHtml(s.name)}</th>`).join('')}<th>Total</th><th>Grade</th><th>GPA</th><th>Result</th><th>Present</th><th>Position</th></tr></thead>
+          <tbody>${rowsHtml || `<tr><td colspan="${5+subjects.length}">No data</td></tr>`}</tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  function buildTemplateCardHTML(record, student, subjects) {
+    const highestBySubject = {};
+    if (record && record.students) {
+      subjects.forEach(s => {
+        let max = null;
+        record.students.forEach(st => {
+          const v = subjectTotal(st, s);
+          if (v !== null) max = (max === null) ? v : Math.max(max, v);
+        });
+        highestBySubject[s.name] = max;
+      });
+    }
+
+    let totalObtained = 0, hasAnyMark = false, failedSubjects = [];
+    const rows = subjects.length ? subjects.map((s, i) => {
+      const cols = subjectColumnKeys(s);
+      const m = (student && student.marks && s.name && student.marks[s.name]) || {};
+      const cellFor = (key) => {
+        if (!cols.includes(key)) return `<span class="dim">—</span>`;
+        const v = m[key];
+        return (v !== undefined && v !== null && v !== '' && !isNaN(v)) ? v : '';
+      };
+      const obt = subjectTotal(student, s);
+      const hasObt = obt !== null;
+      if (hasObt) { totalObtained += obt; hasAnyMark = true; }
+      const pct = (hasObt && s.full) ? (obt / s.full * 100) : null;
+      let g = pct !== null ? gradeFromPercent(pct) : null;
+      
+      const failed = student ? subjectFailed(student, s) : false;
+      if (failed) {
+        g = { letter: 'F', point: 0 };
+      }
+      
+      if (student && subjectFailed(student, s)) failedSubjects.push(s.name);
+      const highest = highestBySubject[s.name];
+      return `
+        <tr>
+          <td style="width:30px;">${i+1}</td>
+          <td class="tname">${escapeHtml(s.name)}</td>
+          <td style="width:40px;">${s.full}</td>
+          <td class="col-exam">${cellFor('att')}</td>
+          <td class="col-exam">${cellFor('la')}</td>
+          <td class="col-exam">${cellFor('mcq')}</td>
+          <td class="col-exam">${cellFor('cq')}</td>
+          <td class="col-exam">${cellFor('pr')}</td>
+          <td style="width:45px;">${hasObt?obt:'<span class="dim">—</span>'}</td>
+          <td style="width:45px;">${(highest!==undefined && highest!==null)?highest:'<span class="dim">—</span>'}</td>
+          <td style="width:40px; ${failed ? 'color:#a41f2b;font-weight:700;' : ''}">${g?g.letter:'<span class="dim">—</span>'}</td>
+          <td style="width:40px; ${failed ? 'color:#a41f2b;font-weight:700;' : ''}">${g?g.point:'<span class="dim">—</span>'}</td>
+        </tr>`;
+    }).join('') :
+      `<tr><td colspan="12" class="tpl-empty-row">No subjects added</td></tr>`;
+
+    const totalFull = subjects.reduce((sum, s) => sum + (s.full || 0), 0);
+    const overallPct = (student && totalFull) ? (totalObtained / totalFull * 100) : null;
+    const overallGrade = overallPct !== null ? gradeFromPercent(overallPct) : null;
+    const resultStatus = student ? (failedSubjects.length ? 'Failed' : (hasAnyMark ? 'Passed' : '—')) : '—';
+
+    const statusKey = getClassKey(record.className, record.section);
+    const status = CLASS_STATUS[statusKey] || { sectionPosition: '', gpaWithout4th: '', workingDays: '', totalPresent: '' };
+
+    const gpa = student && overallGrade ? overallGrade.point : 0;
+    
+    const hasAgri = subjects.some(s => s.name === 'Agricultural Education' && subjectTotal(student, s) !== null);
+    const hasHigherMath = subjects.some(s => s.name === 'Higher Mathematics' && subjectTotal(student, s) !== null);
+    let gpaWithout4th = '—';
+    if (hasAgri || hasHigherMath) {
+      let gpaTotal = 0, gpaCount = 0;
+      subjects.forEach(s => {
+        const obt = subjectTotal(student, s);
+        if (obt !== null) {
+          const pct = (obt / (s.full || 100)) * 100;
+          const grade = gradeFromPercent(pct);
+          gpaTotal += grade.point;
+          gpaCount++;
+        }
+      });
+      if (gpaCount > 0) {
+        gpaWithout4th = (gpaTotal / gpaCount).toFixed(2);
+      }
+    }
+
+    const logoHtml = ACCOUNT_DATA.logo ? 
+      `<img src="${ACCOUNT_DATA.logo}" style="width:64px;height:64px;object-fit:contain;" onerror="this.style.display='none';this.parentElement.innerHTML='🏫';">` : 
+      '🏫';
+
+    return `
+    <div class="tpl-card">
+      <div class="tpl-top">
+        <div class="tpl-logo-ph">${logoHtml}</div>
+        <div class="tpl-titles">
+          <p class="school">${escapeHtml(ACCOUNT_DATA.name)}</p>
+          <p class="addr">${escapeHtml(ACCOUNT_DATA.address)}</p>
+          <p class="script">Academic Transcript</p>
+          <p class="exam">${escapeHtml(record.exam || 'Annual Examination 2026')}</p>
+        </div>
+      </div>
+
+      <div class="tpl-info-row">
+        <table class="tpl-info">
+          <tr><td class="lbl">Student ID</td><td class="val">${student?escapeHtml(student.roll||'—'):'—'}</td><td class="photo-cell" rowspan="3"><div class="photo-box">Photo</div></td></tr>
+          <tr><td class="lbl">Class Roll</td><td class="val">${student?escapeHtml(student.roll||'—'):'—'}</td></tr>
+          <tr><td class="lbl">Name</td><td class="val">${student?escapeHtml(student.name||'—'):'—'}</td></tr>
+          <tr><td class="lbl">Class/Program</td><td class="val">${record?escapeHtml(record.className||'—'):'—'}</td><td class="lbl">Group</td><td class="val">${escapeHtml(record&&record.group ? record.group : (ACCOUNT_DATA.type==='Vocational'?'Technical':'General'))}</td></tr>
+          <tr><td class="lbl">Section</td><td class="val">${record?escapeHtml(record.section||'—'):'—'}</td><td class="lbl">Shift</td><td class="val">${escapeHtml(record&&record.shift?record.shift:'Morning')}</td></tr>
+          <tr><td class="lbl">Session</td><td class="val">${record?escapeHtml(record.session||'—'):'—'}</td><td class="lbl">Version</td><td class="val">Bangla</td></tr>
+          <tr><td class="lbl">Total Present</td><td class="val" colspan="3">${escapeHtml(student&&student.totalPresent?student.totalPresent:'—')}</td></tr>
+        </table>
+
+        <table class="tpl-grade">
+          <thead><tr><th>Letter Grade</th><th>Marks Interval</th><th>Grade Point</th></tr></thead>
+          <tbody>
+            <tr><td>A+</td><td>80 - 100</td><td>5</td></tr>
+            <tr><td>A</td><td>70 - 79</td><td>4</td></tr>
+            <tr><td>A-</td><td>60 - 69</td><td>3.50</td></tr>
+            <tr><td>B</td><td>50 - 59</td><td>3</td></tr>
+            <tr><td>C</td><td>40 - 49</td><td>2</td></tr>
+            <tr><td>D</td><td>33 - 39</td><td>1</td></tr>
+            <tr><td>F</td><td>0 - 32</td><td>0</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <table class="tpl-subjects">
+        <thead>
+          <tr>
+            <th rowspan="2" style="width:30px;">Srl.</th>
+            <th rowspan="2">Subjects</th>
+            <th rowspan="2" style="width:40px;">Full<br>Marks</th>
+            <th colspan="5">Examination</th>
+            <th rowspan="2" style="width:45px;">Total<br>Marks</th>
+            <th rowspan="2" style="width:45px;">Highest<br>Marks</th>
+            <th rowspan="2" style="width:40px;">Letter<br>Grade</th>
+            <th rowspan="2" style="width:40px;">Grade<br>Point</th>
+          </tr>
+          <tr>
+            <th class="col-exam">ATT.</th>
+            <th class="col-exam">LA</th>
+            <th class="col-exam">MCQ</th>
+            <th class="col-exam">CQ</th>
+            <th class="col-exam">PR</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+          <tr class="totalrow">
+            <td colspan="2">Total Exam Marks</td>
+            <td>${totalFull||'—'}</td>
+            <td colspan="6"></td>
+            <td colspan="3">Obtain Marks: ${student ? totalObtained : '—'} &nbsp;|&nbsp; GPA: ${student && overallGrade ? overallGrade.point.toFixed(2) : '—'}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="tpl-remarks-band"><b>Remarks:</b> ${student ? (resultStatus==='Failed' ? 'Needs improvement' : (resultStatus==='Passed' ? 'Satisfactory' : '—')) : '—'}</div>
+
+      <div class="tpl-status-row">
+        <table class="tpl-status">
+          <tr><th colspan="2">Result Status</th></tr>
+          <tr><td class="lbl">Result Status</td><td class="plain">${resultStatus}</td></tr>
+          <tr><td class="lbl">Section Position</td><td class="plain">${student && student.sectionPosition && student.sectionPosition !== '—' ? student.sectionPosition : (resultStatus === 'Failed' ? '—' : '—')}</td></tr>
+          <tr><td class="lbl">GPA [Without 4th]</td><td class="plain">${(hasAgri || hasHigherMath) ? gpaWithout4th : '—'}</td></tr>
+          <tr><td class="lbl">Failed Subject(s)</td><td class="plain">${failedSubjects.length?escapeHtml(failedSubjects.join(', ')):'—'}</td></tr>
+          <tr><td class="lbl">Working Days</td><td class="plain">${status.workingDays || '—'}</td></tr>
+          <tr><td class="lbl">Total Present</td><td class="plain">${escapeHtml(student&&student.totalPresent?student.totalPresent:'—')}</td></tr>
+        </table>
+        <table class="tpl-status">
+          <tr><th>Moral &amp; Behavior Evaluation</th></tr>
+          <tr><td class="plain">Excellent</td></tr>
+          <tr><td class="plain">Good</td></tr>
+          <tr><td class="plain">Average</td></tr>
+          <tr><td class="plain">Poor</td></tr>
+        </table>
+        <table class="tpl-status">
+          <tr><th>Extra Curricular Activities</th></tr>
+          <tr><td class="plain">Sports</td></tr>
+          <tr><td class="plain">Cultural Function</td></tr>
+          <tr><td class="plain">Scout/ BNCC</td></tr>
+          <tr><td class="plain">Math Olympiad</td></tr>
+        </table>
+      </div>
+
+      <div class="tpl-sign-row">
+        <div class="line">
+          ${SIGNATURES.principal.image ? `<img class="sig-img" src="${SIGNATURES.principal.image}">` : ''}
+          ${SIGNATURES.principal.name || 'Principal'}
+          <small>${escapeHtml(ACCOUNT_DATA.name)}</small>
+        </div>
+        <div class="line">Guardian</div>
+        <div class="line">
+          ${SIGNATURES.classTeacher.image ? `<img class="sig-img" src="${SIGNATURES.classTeacher.image}">` : ''}
+          ${SIGNATURES.classTeacher.name || 'Class Teacher'}
+          <small>Internal Examination Committee</small>
+        </div>
+      </div>
+      <div class="tpl-footer-tiny">
+        <span>Established: ${escapeHtml(ACCOUNT_DATA.established)} &nbsp;|&nbsp; EIIN: ${escapeHtml(ACCOUNT_DATA.eiin)}</span>
+        <span>Publish Date: —</span>
+      </div>
+    </div>`;
+  }
+
+  // ============================================================
+  // BOOT
+  // ============================================================
+  (async function boot() {
+    await loadState();
+    renderDashboard();
+  })();
+</script>
+</body>
+</html>
