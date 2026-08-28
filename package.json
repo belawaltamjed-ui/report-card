@@ -33,7 +33,14 @@
       "target": "nsis"
     },
     "mac": {
-      "target": "dmg",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "minimumSystemVersion": "10.13.0"
     },
     "nsis": {
