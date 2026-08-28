@@ -27,7 +27,13 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build and Publish Release
+      - name: Build Desktop App
         run: npm run build
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-build-${{ matrix.os }}
+          path: dist/*
