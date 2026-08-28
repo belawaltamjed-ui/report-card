@@ -24,8 +24,7 @@
     "files": [
       "main.js",
       "preload.js",
-      "index.html",
-      "node_modules/**/*"
+      "index.html"
     ],
     "directories": {
       "output": "dist"
