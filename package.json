@@ -14,10 +14,10 @@
   "dependencies": {
     "sql.js": "^1.10.3"
   },
-  "devDependencies": {
-    "electron": "^31.0.0",
-    "electron-builder": "^24.13.3"
-  },
+ "devDependencies": {
+  "electron": "^22.3.27",
+  "electron-builder": "^24.13.3"
+},
   "build": {
     "appId": "com.tamjed.reportcardmaker",
     "productName": "Report Card Maker",
