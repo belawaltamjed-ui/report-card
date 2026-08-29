@@ -12,6 +12,8 @@
     .stage{width:100%;max-width:460px;transition:max-width .3s ease;}
     .stage.wide{max-width:900px;}
     .dash{background:#fff;border-radius:24px;padding:28px 24px 32px;box-shadow:0 12px 40px rgba(45,30,10,0.10);border:1px solid #d8cfb8;}
+    .dash-pair{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;}
+    .dash-pair .dash{flex:1 1 300px;min-width:280px;}
     .dash-head{display:flex;align-items:center;gap:14px;border-bottom:1px solid #d8cfb8;padding-bottom:18px;margin-bottom:22px;}
     .dash-logo{width:52px;height:52px;border-radius:12px;background:#f3efe3;border:1px solid #d8cfb8;display:flex;align-items:center;justify-content:center;font-size:26px;color:#7a1f2b;flex-shrink:0;overflow:hidden;}
     .dash-logo img{width:100%;height:100%;object-fit:contain;}
@@ -144,12 +146,23 @@
     .tpl-sign-row small{display:block;font-weight:400;color:#555;margin-top:2px;font-size:10px;}
     .tpl-footer-tiny{display:flex;justify-content:space-between;margin-top:16px;font-size:8.5px;color:#888;font-family:'Noto Sans Bengali',sans-serif;flex-wrap:wrap;gap:4px;}
     .tpl-empty-row{color:#999;font-size:11px;font-style:italic;}
-    table.classrep{width:100%;border-collapse:collapse;font-size:11.5px;font-family:'Noto Sans Bengali',sans-serif;margin-bottom:14px;}
-    table.classrep th,table.classrep td{border:1px solid #555;padding:5px 6px;text-align:center;}
-    table.classrep th{background:#eeeeee;font-weight:700;}
+    .classrep-sheet{background:#fff;border:1px solid #145a32;border-radius:4px;padding:20px 22px;font-family:'Noto Sans Bengali',sans-serif;}
+    .classrep-head{text-align:center;margin-bottom:14px;}
+    .classrep-school{font-family:'Noto Serif Bengali',serif;font-size:21px;font-weight:700;color:#145a32;}
+    .classrep-sub{font-size:12.5px;color:#a41f2b;font-weight:600;margin-top:2px;}
+    .classrep-meta{font-size:12px;color:#333;margin-top:6px;border-top:2px solid #145a32;padding-top:8px;}
+    table.classrep{width:100%;border-collapse:collapse;font-size:11px;font-family:'Noto Sans Bengali',sans-serif;margin-bottom:16px;}
+    table.classrep th,table.classrep td{border:1px solid #145a32;padding:5px 6px;text-align:center;}
+    table.classrep th{background:#145a32;color:#fff;font-weight:700;}
+    table.classrep tbody tr:nth-child(even){background:#eef6f0;}
     table.classrep td.nm{text-align:left;}
     table.classrep .res-pass{color:#1b7a3d;font-weight:700;}
     table.classrep .res-fail{color:#a41f2b;font-weight:700;}
+    .classrep-empty{padding:16px !important;color:#333;background:#eef6f0;}
+    .classrep-sign-row{display:flex;justify-content:space-between;margin-top:34px;font-size:12px;font-family:'Noto Sans Bengali',sans-serif;}
+    .classrep-sig-col{text-align:center;min-width:180px;}
+    .classrep-sig-line{border-top:1px solid #333;margin-bottom:6px;}
+    .classrep-sig-col small{color:#555;font-weight:400;}
     .no-print{display:block;}
     #printArea{max-width:100%;overflow-x:auto;}
     .a4-sheet{width:210mm;height:297mm;margin:0 auto 22px;background:#fff;box-shadow:0 4px 22px rgba(0,0,0,.16);position:relative;overflow:hidden;box-sizing:border-box;}
@@ -185,7 +198,7 @@
     .logo-preview{display:flex;flex-direction:column;align-items:center;gap:8px;}
     .logo-preview .logo-img{width:80px;height:80px;object-fit:contain;border-radius:8px;border:1px solid #d8cfb8;padding:4px;background:#fff;}
     
-    @media (max-width:480px){.card-grid{grid-template-columns:1fr;}.action-grid{grid-template-columns:1fr;}.stage.wide{max-width:100%;}.tpl-status-row{grid-template-columns:1fr;}.tpl-sign-row{grid-template-columns:1fr;}.status-input-row{grid-template-columns:1fr;}.loading-bar{width:200px;}}
+    @media (max-width:480px){.card-grid{grid-template-columns:1fr;}.action-grid{grid-template-columns:1fr;}.stage.wide{max-width:100%;}.tpl-status-row{grid-template-columns:1fr;}.tpl-sign-row{grid-template-columns:1fr;}.status-input-row{grid-template-columns:1fr;}.loading-bar{width:200px;}.dash-pair{flex-direction:column;}.dash-pair .dash{min-width:0;}.classrep-sign-row{flex-direction:column;gap:20px;align-items:center;}}
   </style>
 </head>
 <body>
@@ -321,6 +334,25 @@
       }
     });
     return any ? sum : null;
+  }
+
+  // Builds a "part+part" style string for a subject's marks, e.g. "10+23"
+  // (MCQ+CQ) or "10+23+8" (MCQ+CQ+PR), in COLUMN_ORDER. Used on the
+  // combined class report so each cell shows the mark breakdown instead
+  // of just a single summed number.
+  function subjectPartsString(student, s) {
+    if (!student || !student.marks || !s || !s.name) return null;
+    const m = student.marks[s.name];
+    if (!m || typeof m !== 'object') return null;
+    const keys = subjectColumnKeys(s);
+    const parts = [];
+    keys.forEach(k => {
+      const v = m[k];
+      if (v !== undefined && v !== null && v !== '' && !isNaN(v)) {
+        parts.push(Number(v));
+      }
+    });
+    return parts.length ? parts.join('+') : null;
   }
 
   function subjectFailed(student, s) {
@@ -482,74 +514,67 @@
   // ============================================================
   function renderDashboard() {
     if (progressEl) progressEl.style.display = 'none';
-    document.querySelector('.stage').classList.remove('wide');
+    document.querySelector('.stage').classList.add('wide');
 
     const genClasses = getDefaultClasses('General');
     const vocClasses = getDefaultClasses('Vocational');
     
-    const logoHtml = `<img src="${SCHOOL_LOGO}" alt="Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:30px;\\'>🏫</span>';">`;
+    const logoHtml = `<img src="${SCHOOL_LOGO}" alt="Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:26px;\\'>🏫</span>';">`;
+
+    function typeCard(type, badgeLabel, classes, chipColor) {
+      return `
+        <div class="dash">
+          <div class="dash-head">
+            <div class="dash-logo">
+              ${logoHtml}
+            </div>
+            <div>
+              <div class="dash-name">${escapeHtml(ACCOUNT_DATA.name)}</div>
+              <span class="dash-badge" style="${chipColor?`color:${chipColor};background:${chipColor}15;`:''}">${escapeHtml(badgeLabel)}</span>
+            </div>
+          </div>
+          <div class="dash-rows">
+            <div><b>Established:</b> ${escapeHtml(ACCOUNT_DATA.established)}</div>
+            <div><b>Address:</b> ${escapeHtml(ACCOUNT_DATA.address)}</div>
+            <div><b>EIIN:</b> ${escapeHtml(ACCOUNT_DATA.eiin)}</div>
+          </div>
+          <button class="btn btn-primary" style="margin-top:0;" onclick="selectSchoolType('${type}','design')">✏️ Design your report card</button>
+          <button class="btn btn-gold" onclick="selectSchoolType('${type}','students')">👨‍🎓 Student Info &amp; Report Card</button>
+        </div>
+      `;
+    }
 
     host.innerHTML = `
-      <div class="dash">
-        <div class="dash-head">
-          <div class="dash-logo">
-            ${logoHtml}
-          </div>
-          <div>
-            <div class="dash-name">${escapeHtml(ACCOUNT_DATA.name)}</div>
-            <span class="dash-badge">${escapeHtml(ACCOUNT_DATA.type)}</span>
-          </div>
-        </div>
-        <div class="dash-rows">
-          <div><b>Established:</b> ${escapeHtml(ACCOUNT_DATA.established)}</div>
-          <div><b>Address:</b> ${escapeHtml(ACCOUNT_DATA.address)}</div>
-          <div><b>EIIN:</b> ${escapeHtml(ACCOUNT_DATA.eiin)}</div>
-        </div>
+      <div class="dash-pair">
+        ${typeCard('General', 'General', genClasses)}
+        ${typeCard('Vocational', 'Vocational', vocClasses, '#ad8a4e')}
+      </div>
 
-        <div class="card-grid">
-          <div class="card-box general" onclick="switchSchoolType('General')">
-            <span class="tag">📚</span>
-            <span class="big-icon">🏛️</span>
-            <h3>General</h3>
-            <div class="sub-line">Science · Commerce · Humanities</div>
-            <div class="chip">${genClasses.length} Classes</div>
-          </div>
-          <div class="card-box vocational" onclick="switchSchoolType('Vocational')">
-            <span class="tag">🔧</span>
-            <span class="big-icon">⚙️</span>
-            <h3>Vocational</h3>
-            <div class="sub-line">Civil · Electrical · Technical</div>
-            <div class="chip">${vocClasses.length} Classes</div>
-          </div>
+      <div class="action-grid" style="margin-top:18px;">
+        <div class="action-card" onclick="exportBackup()">
+          <span class="icon">💾</span>
+          <h4>Backup Download</h4>
+          <p>Save a data file to your device</p>
         </div>
-
-        <div class="action-grid">
-          <div class="action-card" onclick="goDesign()">
-            <span class="icon">✏️</span>
-            <h4>Design Report Card</h4>
-            <p>Create subjects & template</p>
-          </div>
-          <div class="action-card" onclick="goStudents()">
-            <span class="icon">👨‍🎓</span>
-            <h4>Students & Reports</h4>
-            <p>Data entry & reports</p>
-          </div>
-        </div>
-
-        <div class="action-grid" style="margin-top:14px;">
-          <div class="action-card" onclick="exportBackup()">
-            <span class="icon">💾</span>
-            <h4>Backup Download</h4>
-            <p>Save a data file to your device</p>
-          </div>
-          <div class="action-card" onclick="triggerImportBackup()">
-            <span class="icon">📂</span>
-            <h4>Restore Backup</h4>
-            <p>Load a previously saved backup</p>
-          </div>
+        <div class="action-card" onclick="triggerImportBackup()">
+          <span class="icon">📂</span>
+          <h4>Restore Backup</h4>
+          <p>Load a previously saved backup</p>
         </div>
       </div>
     `;
+  }
+
+  // Selects which type (General/Vocational) the person wants to work
+  // on, then jumps straight to Design or Student/Reports for it.
+  // Same underlying school & data — this only switches the active
+  // class-set (General classes vs Vocational classes).
+  function selectSchoolType(type, dest) {
+    if (ACCOUNT_DATA.type !== type) {
+      switchSchoolType(type);
+    }
+    if (dest === 'design') goDesign();
+    else goStudents();
   }
 
   function switchSchoolType(type) {
@@ -570,7 +595,6 @@
       CLASS_SUBJECTS[key] = templateSubjects.length ? templateSubjects.map(s => ({...s})) : DEFAULT_SUBJECTS.map(s => ({...s}));
     });
     persistState();
-    renderDashboard();
   }
 
   function topBackButton(label, action) {
@@ -722,7 +746,6 @@
   }
 
   function backToDashboard() {
-    document.querySelector('.stage').classList.remove('wide');
     renderDashboard();
   }
 
@@ -1446,7 +1469,8 @@
         if (obt !== null) {
           totalObt += obt;
           if (subjectFailed(st, sub)) failed = true;
-          return `<td>${obt}</td>`;
+          const partsStr = subjectPartsString(st, sub);
+          return `<td>${partsStr !== null ? escapeHtml(partsStr) : obt}</td>`;
         }
         return `<td class="dim">—</td>`;
       }).join('');
@@ -1475,10 +1499,27 @@
         </div>
       </div>
       <div id="printArea">
-        <table class="classrep">
-          <thead><tr><th>Name</th><th>Roll</th>${subjects.map(s=>`<th>${escapeHtml(s.name)}</th>`).join('')}<th>Total</th><th>Grade</th><th>GPA</th><th>Result</th><th>Present</th><th>Position</th></tr></thead>
-          <tbody>${rowsHtml || `<tr><td colspan="${5+subjects.length}">No data</td></tr>`}</tbody>
-        </table>
+        <div class="classrep-sheet">
+          <div class="classrep-head">
+            <div class="classrep-school">${escapeHtml(ACCOUNT_DATA.name)}</div>
+            <div class="classrep-sub">Combined Result Sheet — ${escapeHtml(record.session || '2026')}</div>
+            <div class="classrep-meta">Class: ${escapeHtml(record.className)} &nbsp;&nbsp; Section/Group: ${escapeHtml(record.section||'-')}</div>
+          </div>
+          <table class="classrep">
+            <thead><tr><th>Name</th><th>Roll</th>${subjects.map(s=>`<th>${escapeHtml(s.name)}<br><span style="font-weight:400;">(Full ${s.full})</span></th>`).join('')}<th>Total</th><th>Grade</th><th>GPA</th><th>Result</th><th>Present</th><th>Position</th></tr></thead>
+            <tbody>${rowsHtml || `<tr><td colspan="${7+subjects.length}" class="classrep-empty">No data available. Please add students.</td></tr>`}</tbody>
+          </table>
+          <div class="classrep-sign-row">
+            <div class="classrep-sig-col">
+              <div class="classrep-sig-line"></div>
+              <div>${escapeHtml(SIGNATURES.classTeacher.name || 'Class Teacher')}<br><small>Class Teacher's Signature</small></div>
+            </div>
+            <div class="classrep-sig-col">
+              <div class="classrep-sig-line"></div>
+              <div>${escapeHtml(SIGNATURES.principal.name || 'Head Teacher')}<br><small>Head Teacher's Signature</small></div>
+            </div>
+          </div>
+        </div>
       </div>
     `;
   }
