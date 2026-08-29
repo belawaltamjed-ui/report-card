@@ -206,14 +206,16 @@
   // ============================================================
   // FULL CODE – Report Card Maker
   // TWO Separate Cards: General & Vocational
-  // Logo: logo.png (you can add logo.png file)
+  // Logo: fixed logo.png file shipped with the app (no upload needed)
   // FIX: Failed subjects show F grade
   // FIX: Logo shows in dashboard and report card
   // ============================================================
 
+  // School logo is a static file bundled with the app — always "logo.png".
+  const SCHOOL_LOGO = 'logo.png';
+
   const ACCOUNT_DATA = {
     name: 'Kalia Chapra Sugar Mills High School',
-    logo: '', // Uploaded via the dashboard logo click (stored as base64, works reliably in the packaged app)
     established: '1975',
     address: 'Pakundia, Kishoreganj',
     eiin: '110567',
@@ -485,16 +487,13 @@
     const genClasses = getDefaultClasses('General');
     const vocClasses = getDefaultClasses('Vocational');
     
-    const logoHtml = ACCOUNT_DATA.logo ? 
-      `<img src="${ACCOUNT_DATA.logo}" alt="Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:30px;\\'>🏫</span>';">` : 
-      `<span style="font-size:30px;">🏫</span>`;
+    const logoHtml = `<img src="${SCHOOL_LOGO}" alt="Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:30px;\\'>🏫</span>';">`;
 
     host.innerHTML = `
       <div class="dash">
         <div class="dash-head">
-          <div class="dash-logo" onclick="document.getElementById('logoUpload').click()" style="cursor:pointer;" title="${ACCOUNT_DATA.logo ? 'Click to change logo' : 'Click to upload school logo'}">
+          <div class="dash-logo">
             ${logoHtml}
-            <input type="file" id="logoUpload" accept="image/*" style="display:none;" onchange="uploadLogo(event)">
           </div>
           <div>
             <div class="dash-name">${escapeHtml(ACCOUNT_DATA.name)}</div>
@@ -551,18 +550,6 @@
         </div>
       </div>
     `;
-  }
-
-  function uploadLogo(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      ACCOUNT_DATA.logo = e.target.result;
-      persistState();
-      renderDashboard();
-    };
-    reader.readAsDataURL(file);
   }
 
   function switchSchoolType(type) {
@@ -1578,8 +1565,8 @@
       }
     }
 
-    const logoHtml = ACCOUNT_DATA.logo ?
-      `<img src="${ACCOUNT_DATA.logo}" style="width:64px;height:64px;object-fit:contain;" onerror="this.style.display='none';this.parentElement.innerHTML='🏫';">` :
+    const logoHtml = SCHOOL_LOGO ?
+      `<img src="${SCHOOL_LOGO}" style="width:64px;height:64px;object-fit:contain;" onerror="this.style.display='none';this.parentElement.innerHTML='🏫';">` :
       '🏫';
 
     return `
