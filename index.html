@@ -102,7 +102,7 @@
     .opt-card .oc-icon{width:38px;height:38px;border-radius:9px;background:#7a1f2b;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
     .opt-card .oc-title{font-weight:700;font-size:13.5px;font-family:'Noto Serif Bengali',serif;margin:0;}
     .opt-card .oc-sub{font-size:11.5px;color:#6b6455;margin:2px 0 0;}
-    .tpl-card{background:#fff;border:2px solid #555;padding:22px 26px;font-family:'Georgia','Times New Roman',serif;color:#111;}
+    .tpl-card{background:#fff;border:2px solid #555;padding:22px 26px;font-family:'Georgia','Times New Roman',serif;color:#111;position:relative;}
     .tpl-top{display:flex;align-items:flex-start;gap:16px;}
     .tpl-logo{width:64px;height:64px;object-fit:contain;flex-shrink:0;margin-top:4px;}
     .tpl-logo-ph{width:64px;height:64px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#999;font-family:'Noto Sans Bengali',sans-serif;margin-top:4px;overflow:hidden;}
@@ -125,7 +125,7 @@
     table.tpl-grade th{background:#dadada;font-weight:700;}
     table.tpl-subjects{width:100%;border-collapse:collapse;margin-top:14px;font-size:11px;font-family:Georgia,serif;table-layout:fixed;}
     table.tpl-subjects th,table.tpl-subjects td{border:1px solid #555;padding:4px 2px;text-align:center;overflow:hidden;word-break:break-word;}
-    table.tpl-subjects th{background:#eeeeee;font-weight:700;font-family:'Noto Sans Bengali',sans-serif;}
+    table.tpl-subjects th{background:#eeeeee;font-weight:700;font-family:'Noto Sans Bengali',sans-serif;color:#111;}
     table.tpl-subjects td.tname{text-align:left;font-family:'Noto Sans Bengali',sans-serif;}
     table.tpl-subjects .col-exam{width:36px;}
     table.tpl-subjects tr.totalrow td{font-weight:700;background:#f5f5f5;}
@@ -146,7 +146,7 @@
     .tpl-sign-row small{display:block;font-weight:400;color:#555;margin-top:2px;font-size:10px;}
     .tpl-footer-tiny{display:flex;justify-content:space-between;margin-top:16px;font-size:8.5px;color:#888;font-family:'Noto Sans Bengali',sans-serif;flex-wrap:wrap;gap:4px;}
     .tpl-empty-row{color:#999;font-size:11px;font-style:italic;}
-    .classrep-sheet{background:#fff;border:1px solid #145a32;border-radius:4px;padding:20px 22px;font-family:'Noto Sans Bengali',sans-serif;}
+    .classrep-sheet{background:#fff;border:1px solid #145a32;border-radius:4px;padding:20px 22px;font-family:'Noto Sans Bengali',sans-serif;position:relative;}
     .classrep-head{text-align:center;margin-bottom:14px;}
     .classrep-school{font-family:'Noto Serif Bengali',serif;font-size:21px;font-weight:700;color:#145a32;}
     .classrep-sub{font-size:12.5px;color:#a41f2b;font-weight:600;margin-top:2px;}
@@ -166,12 +166,21 @@
     .no-print{display:block;}
     #printArea{max-width:100%;overflow-x:auto;}
     .a4-sheet{width:210mm;height:297mm;margin:0 auto 22px;background:#fff;box-shadow:0 4px 22px rgba(0,0,0,.16);position:relative;overflow:hidden;box-sizing:border-box;}
-    .a4-fit-wrap{position:absolute;top:12mm;left:12mm;width:186mm;height:273mm;overflow:hidden;}
+    .a4-fit-wrap{position:absolute;top:12mm;left:12mm;width:186mm;height:273mm;overflow:hidden;z-index:1;}
     .a4-fit-wrap .tpl-card{transform-origin:top left;}
     .a4-sheet-landscape{width:297mm;height:210mm;margin:0 auto 22px;background:#fff;box-shadow:0 4px 22px rgba(0,0,0,.16);position:relative;overflow:hidden;box-sizing:border-box;}
-    .a4-landscape-fit-wrap{position:absolute;top:10mm;left:10mm;width:277mm;height:190mm;overflow:hidden;}
+    .a4-landscape-fit-wrap{position:absolute;top:10mm;left:10mm;width:277mm;height:190mm;overflow:hidden;z-index:1;}
     .a4-landscape-fit-wrap .classrep-sheet{transform-origin:top left;}
-    @media print{body *{visibility:hidden;}#printArea,#printArea *{visibility:visible;}#printArea{position:absolute;top:0;left:0;width:100%;margin:0;padding:0;}.no-print{display:none !important;}.a4-sheet,.a4-sheet-landscape{margin:0;box-shadow:none;}@page{size:A4 portrait;margin:0;}}
+    .page-watermark{position:absolute;top:50%;left:50%;width:60%;height:60%;transform:translate(-50%,-50%);background-image:url('logo.png');background-repeat:no-repeat;background-position:center;background-size:contain;opacity:0.06;z-index:0;pointer-events:none;}
+    @media print{
+      *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important;}
+      body *{visibility:hidden;}
+      #printArea,#printArea *{visibility:visible;}
+      #printArea{position:absolute;top:0;left:0;width:100%;margin:0;padding:0;}
+      .no-print{display:none !important;}
+      .a4-sheet,.a4-sheet-landscape{margin:0;box-shadow:none;}
+      @page{size:A4 portrait;margin:0;}
+    }
     .progress{display:flex;gap:6px;justify-content:center;margin-bottom:22px;}
     .progress span{width:7px;height:7px;border-radius:50%;background:#d8cfb8;transition:background .2s;}
     .progress span.done{background:#ad8a4e;}
@@ -182,17 +191,24 @@
     .card-box:nth-child(2){animation-delay:0.15s;}
     @keyframes floatUp{0%{opacity:0;transform:translateY(24px) scale(0.96);}100%{opacity:1;transform:translateY(0) scale(1);}}
     .dash-head{animation:fadeIn 0.4s ease;}
-    
+
     .loading-page{position:fixed;top:0;left:0;width:100%;height:100%;background:#f3efe3;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:all 0.8s ease;}
     .loading-page.hide{opacity:0;pointer-events:none;}
-    .loading-logo{width:100px;height:100px;background:#7a1f2b;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:50px;color:#fff;margin-bottom:20px;animation:pulse 1.5s ease-in-out infinite;}
-    .loading-title{font-family:'Noto Serif Bengali',serif;font-size:28px;font-weight:700;color:#7a1f2b;margin-bottom:8px;}
-    .loading-sub{font-size:16px;color:#6b6455;font-weight:400;}
-    .loading-bar{width:300px;height:4px;background:#d8cfb8;border-radius:4px;margin-top:30px;overflow:hidden;}
+    .loading-logo-wrap{position:relative;width:120px;height:120px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;}
+    .loading-ring{position:absolute;width:120px;height:120px;border-radius:50%;border:3px solid transparent;border-top-color:#7a1f2b;border-right-color:#ad8a4e;animation:ringSpin 1.3s linear infinite;z-index:1;}
+    .loading-logo-img{width:96px;height:96px;border-radius:50%;object-fit:cover;background:#fff;box-shadow:0 8px 26px rgba(122,31,43,0.28);position:relative;z-index:2;animation:logoPop 0.7s cubic-bezier(.34,1.56,.64,1) both, logoFloat 2.4s ease-in-out 0.7s infinite;}
+    .loading-logo-fallback{width:96px;height:96px;border-radius:50%;background:#7a1f2b;display:flex;align-items:center;justify-content:center;font-size:48px;color:#fff;position:relative;z-index:2;animation:pulse 1.5s ease-in-out infinite;}
+    .loading-title{font-family:'Noto Serif Bengali',serif;font-size:28px;font-weight:700;color:#7a1f2b;margin-bottom:8px;opacity:0;animation:fadeInUp 0.6s ease 0.3s forwards;}
+    .loading-sub{font-size:16px;color:#6b6455;font-weight:400;opacity:0;animation:fadeInUp 0.6s ease 0.45s forwards;}
+    .loading-bar{width:300px;height:4px;background:#d8cfb8;border-radius:4px;margin-top:30px;overflow:hidden;opacity:0;animation:fadeInUp 0.6s ease 0.6s forwards;}
     .loading-bar-inner{height:100%;width:0%;background:#7a1f2b;border-radius:4px;animation:loadBar 2s ease forwards;}
     @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
     @keyframes loadBar{0%{width:0%;}100%{width:100%;}}
-    
+    @keyframes ringSpin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+    @keyframes logoPop{0%{opacity:0;transform:scale(0.5);}100%{opacity:1;transform:scale(1);}}
+    @keyframes logoFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
     .shift-select{width:100%;padding:10px 14px;border:1px solid #d8cfb8;border-radius:8px;font-size:14px;font-family:inherit;background:#fbf9f3;color:#211e1a;}
     .shift-select:focus{outline:2px solid #dcc898;border-color:#ad8a4e;}
     .logo-upload-area{border:2px dashed #d8cfb8;border-radius:12px;padding:20px;text-align:center;cursor:pointer;background:#fbf9f3;transition:all 0.2s;}
@@ -200,13 +216,17 @@
     .logo-upload-area img{max-width:100px;max-height:80px;object-fit:contain;border-radius:8px;}
     .logo-preview{display:flex;flex-direction:column;align-items:center;gap:8px;}
     .logo-preview .logo-img{width:80px;height:80px;object-fit:contain;border-radius:8px;border:1px solid #d8cfb8;padding:4px;background:#fff;}
-    
+
     @media (max-width:480px){.card-grid{grid-template-columns:1fr;}.action-grid{grid-template-columns:1fr;}.stage.wide{max-width:100%;}.tpl-status-row{grid-template-columns:1fr;}.tpl-sign-row{grid-template-columns:1fr;}.status-input-row{grid-template-columns:1fr;}.loading-bar{width:200px;}.dash-pair{flex-direction:column;}.dash-pair .dash{min-width:0;}.classrep-sign-row{flex-direction:column;gap:20px;align-items:center;}}
   </style>
 </head>
 <body>
   <div class="loading-page" id="loadingPage">
-    <div class="loading-logo">📘</div>
+    <div class="loading-logo-wrap">
+      <div class="loading-ring"></div>
+      <img class="loading-logo-img" src="apk_logo.jpeg" alt="Report Card Maker" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="loading-logo-fallback" style="display:none;">📘</div>
+    </div>
     <div class="loading-title">Report Card Maker</div>
     <div class="loading-sub">Created by Tamjed</div>
     <div class="loading-bar"><div class="loading-bar-inner"></div></div>
@@ -339,10 +359,6 @@
     return any ? sum : null;
   }
 
-  // Builds a "part+part" style string for a subject's marks, e.g. "10+23"
-  // (MCQ+CQ) or "10+23+8" (MCQ+CQ+PR), in COLUMN_ORDER. Used on the
-  // combined class report so each cell shows the mark breakdown instead
-  // of just a single summed number.
   function subjectPartsString(student, s) {
     if (!student || !student.marks || !s || !s.name) return null;
     const m = student.marks[s.name];
@@ -435,8 +451,6 @@
     }
   }
 
-  // Debounced version for high-frequency events like typing marks,
-  // so we don't hammer the database on every keystroke.
   function schedulePersist() {
     clearTimeout(_persistTimer);
     _persistTimer = setTimeout(persistState, 500);
@@ -521,7 +535,7 @@
 
     const genClasses = getDefaultClasses('General');
     const vocClasses = getDefaultClasses('Vocational');
-    
+
     const logoHtml = `<img src="${SCHOOL_LOGO}" alt="Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:26px;\\'>🏫</span>';">`;
 
     function typeCard(type, badgeLabel, classes, chipColor) {
@@ -568,10 +582,6 @@
     `;
   }
 
-  // Selects which type (General/Vocational) the person wants to work
-  // on, then jumps straight to Design or Student/Reports for it.
-  // Same underlying school & data — this only switches the active
-  // class-set (General classes vs Vocational classes).
   function selectSchoolType(type, dest) {
     if (ACCOUNT_DATA.type !== type) {
       switchSchoolType(type);
@@ -885,13 +895,13 @@
         ${topBackButton('Back to Class List', 'renderClassListScreen()')}
         <h2>${escapeHtml(record.className)} — ${escapeHtml(record.section||'-')}</h2>
         <p class="sub">Manage subjects for this class. Global subjects are pre-loaded.</p>
-        
+
         <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
           <label style="font-size:12px;font-weight:600;color:#6b6455;">Exam Name:</label>
           <input type="text" id="classExamName" value="${escapeAttr(record.exam||'Annual Examination 2026')}" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid #d8cfb8;border-radius:6px;font-size:13px;background:#fbf9f3;">
           <button class="btn btn-primary" style="width:auto;padding:8px 20px;margin:0;" onclick="updateExamName()">Update</button>
         </div>
-        
+
         <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
           <label style="font-size:12px;font-weight:600;color:#6b6455;">Shift:</label>
           <select id="classShift" style="padding:8px 12px;border:1px solid #d8cfb8;border-radius:6px;font-size:13px;background:#fbf9f3;font-family:inherit;">
@@ -901,7 +911,7 @@
           </select>
           <button class="btn btn-primary" style="width:auto;padding:8px 20px;margin:0;" onclick="updateShift()">Update Shift</button>
         </div>
-        
+
         <div class="status-input-row">
           <div><label>Section Position (Auto Calculated)</label><input type="text" id="status_position" value="${escapeAttr(status.sectionPosition)}" readonly style="background:#eee;cursor:not-allowed;"></div>
           <div><label>GPA [Without 4th] (Auto Calculated)</label><input type="text" id="status_gpa" value="${escapeAttr(status.gpaWithout4th)}" readonly style="background:#eee;cursor:not-allowed;"></div>
@@ -909,12 +919,12 @@
           <div><label>Total Present (Per Student)</label><span style="font-size:11px;color:#6b6455;">Enter in marks sheet</span></div>
         </div>
         <button class="btn btn-primary" style="width:auto;padding:8px 20px;margin:0 0 12px 0;" onclick="saveStatus()">Save Status</button>
-        
+
         <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
           <button class="btn btn-primary" style="width:auto;padding:8px 20px;margin:0;" onclick="renderAddClassSubject('${key}')">+ Add Subject</button>
           <button class="btn btn-primary" style="width:auto;padding:8px 20px;margin:0;background:#ad8a4e;" onclick="goToMarksEntry()">📝 Enter Marks</button>
         </div>
-        
+
         <div class="subject-list-wrap">
           ${subList || '<div style="color:#6b6455;text-align:center;padding:10px;">No subjects added. Add from global template or add new.</div>'}
         </div>
@@ -1193,7 +1203,7 @@
     if (currentRecord && currentRecord.students) {
       const key = getClassKey(currentRecord.className, currentRecord.section);
       const subjects = CLASS_SUBJECTS[key] || [];
-      
+
       const studentsWithMarks = currentRecord.students.filter(st => st.name && st.name.trim());
       const studentData = studentsWithMarks.map(st => {
         let totalObt = 0, totalFull = 0;
@@ -1210,12 +1220,12 @@
         const grade = gradeFromPercent(pct);
         return { student: st, totalObt, totalFull, pct, gpa: grade.point, hasFailed };
       });
-      
+
       const passedStudents = studentData.filter(d => !d.hasFailed);
       const failedStudents = studentData.filter(d => d.hasFailed);
-      
+
       passedStudents.sort((a, b) => b.pct - a.pct);
-      
+
       let position = 1;
       passedStudents.forEach((data, index) => {
         if (index > 0 && data.pct < passedStudents[index-1].pct) {
@@ -1223,19 +1233,18 @@
         }
         data.student.sectionPosition = position;
       });
-      
+
       failedStudents.forEach(data => {
         data.student.sectionPosition = '—';
       });
-      
-      // Calculate GPA Without 4th
+
       let totalGPA = 0;
       let count = 0;
       studentData.forEach(data => {
         const st = data.student;
         const hasAgri = subjects.some(s => s.name === 'Agricultural Education' && subjectTotal(st, s) !== null);
         const hasHigherMath = subjects.some(s => s.name === 'Higher Mathematics' && subjectTotal(st, s) !== null);
-        
+
         if (hasAgri || hasHigherMath) {
           let gpaTotal = 0;
           let gpaCount = 0;
@@ -1256,21 +1265,21 @@
           }
         }
       });
-      
+
       if (count > 0) {
         const avgGPA = totalGPA / count;
         CLASS_STATUS[key].gpaWithout4th = avgGPA.toFixed(2);
         const gpaInput = document.getElementById('status_gpa');
         if (gpaInput) gpaInput.value = avgGPA.toFixed(2);
       }
-      
+
       const positionStr = passedStudents.map((data, i) => {
         const pos = data.student.sectionPosition;
         const suffix = pos === 1 ? 'st' : pos === 2 ? 'nd' : pos === 3 ? 'rd' : 'th';
         return `${data.student.name}: ${pos}${suffix}`;
       }).join(', ');
       CLASS_STATUS[key].sectionPosition = positionStr || '—';
-      
+
       const posInput = document.getElementById('status_position');
       if (posInput) posInput.value = positionStr || '—';
     }
@@ -1364,11 +1373,11 @@
         ${topBackButton('Back to Marks Sheet', 'goToMarksEntry()')}
         <h2>${escapeHtml(record.className)} — ${escapeHtml(record.section||'-')}</h2>
         <p class="sub">${record.students?record.students.length:0} students data available. Choose an option below.</p>
-        
+
         <div style="background:#dcfce7;padding:10px 14px;border-radius:8px;margin-bottom:14px;font-size:12px;color:#166534;">
           ✅ Data saved. You can come back anytime.
         </div>
-        
+
         <div class="opt-cards">
           <div class="opt-card" onclick="renderAllReports()">
             <div class="oc-icon">📄</div>
@@ -1385,7 +1394,7 @@
             </div>
           </div>
         </div>
-        
+
         <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
           <button class="btn btn-outline" style="flex:1;" onclick="renderSpreadsheet(currentRecord)">✏️ Edit Data</button>
           <button class="btn btn-outline" style="flex:1;background:#eee;color:#333;border-color:#ccc;" onclick="renderClassListScreen()">← Back to Classes</button>
@@ -1404,6 +1413,7 @@
     const named = (record.students || []).filter(s => s.name && s.name.trim());
     const cardsHtml = named.map((st, i) => `
       <div class="a4-sheet"${i < named.length - 1 ? ' style="page-break-after:always;"' : ''}>
+        <div class="page-watermark"></div>
         <div class="a4-fit-wrap">
           ${buildTemplateCardHTML(record, st, subjects)}
         </div>
@@ -1426,12 +1436,6 @@
     fitCardsToA4();
   }
 
-  // ============================================================
-  // PRINT ORIENTATION
-  // Individual report cards print portrait (one student per A4 page).
-  // The combined class report prints landscape, since it has many
-  // subject columns and needs the extra width to fit on one page.
-  // ============================================================
   function setPrintOrientation(orientation) {
     let style = document.getElementById('printOrientationStyle');
     if (!style) {
@@ -1443,11 +1447,6 @@
     style.textContent = `@media print { @page { size: A4 ${orientation}; margin: ${margin}; } }`;
   }
 
-  // ============================================================
-  // A4 AUTO-FIT
-  // Scales each report card's fonts & boxes uniformly so it always
-  // fills exactly one A4 page, whether it has few or many subjects.
-  // ============================================================
   function fitCardsToA4() {
     const run = () => {
       document.querySelectorAll('.a4-fit-wrap').forEach(wrap => {
@@ -1459,13 +1458,11 @@
         const targetHeight = wrap.clientHeight;
         if (!naturalHeight || !targetHeight) return;
         let scale = targetHeight / naturalHeight;
-        scale = Math.max(0.55, Math.min(scale, 1.7)); // keep text/boxes at a sane size
+        scale = Math.max(0.55, Math.min(scale, 1.7));
         card.style.width = (wrap.clientWidth / scale) + 'px';
         card.style.transform = 'scale(' + scale + ')';
       });
     };
-    // Run after layout settles, and again once web fonts finish loading
-    // (font swap changes text width/height and would throw the fit off).
     requestAnimationFrame(() => requestAnimationFrame(run));
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(run).catch(() => {});
@@ -1473,9 +1470,6 @@
     setTimeout(run, 400);
   }
 
-  // Same idea as fitCardsToA4, but for the combined class report table:
-  // no matter how many subject columns it has, it's scaled down (never
-  // up) to always fit within one landscape A4 page.
   function fitClassRepToA4() {
     const run = () => {
       document.querySelectorAll('.a4-landscape-fit-wrap').forEach(wrap => {
@@ -1489,7 +1483,7 @@
         const targetHeight = wrap.clientHeight;
         if (!naturalWidth || !naturalHeight || !targetWidth || !targetHeight) return;
         let scale = Math.min(targetWidth / naturalWidth, targetHeight / naturalHeight);
-        scale = Math.min(scale, 1); // never scale up, only shrink to fit
+        scale = Math.min(scale, 1);
         sheet.style.width = (targetWidth / scale) + 'px';
         sheet.style.transform = 'scale(' + scale + ')';
       });
@@ -1550,6 +1544,7 @@
       </div>
       <div id="printArea">
         <div class="a4-sheet-landscape">
+          <div class="page-watermark"></div>
           <div class="a4-landscape-fit-wrap">
             <div class="classrep-sheet">
               <div class="classrep-head">
@@ -1608,12 +1603,12 @@
       if (hasObt) { totalObtained += obt; hasAnyMark = true; }
       const pct = (hasObt && s.full) ? (obt / s.full * 100) : null;
       let g = pct !== null ? gradeFromPercent(pct) : null;
-      
+
       const failed = student ? subjectFailed(student, s) : false;
       if (failed) {
         g = { letter: 'F', point: 0 };
       }
-      
+
       if (student && subjectFailed(student, s)) failedSubjects.push(s.name);
       const highest = highestBySubject[s.name];
       return `
@@ -1643,7 +1638,7 @@
     const status = CLASS_STATUS[statusKey] || { sectionPosition: '', gpaWithout4th: '', workingDays: '', totalPresent: '' };
 
     const gpa = student && overallGrade ? overallGrade.point : 0;
-    
+
     const hasAgri = subjects.some(s => s.name === 'Agricultural Education' && subjectTotal(student, s) !== null);
     const hasHigherMath = subjects.some(s => s.name === 'Higher Mathematics' && subjectTotal(student, s) !== null);
     let gpaWithout4th = '—';

@@ -21,17 +21,20 @@
   "build": {
     "appId": "com.tamjed.reportcardmaker",
     "productName": "Report Card Maker",
+    "icon": "build/icon.png",
     "files": [
       "main.js",
       "preload.js",
       "index.html",
-      "logo.png"
+      "logo.png",
+      "apk_logo.jpeg"
     ],
     "directories": {
       "output": "dist"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "build/icon.png"
     },
     "mac": {
       "target": [
@@ -42,6 +45,7 @@
           ]
         }
       ],
+      "icon": "build/icon.png",
       "minimumSystemVersion": "10.13.0"
     },
     "nsis": {
