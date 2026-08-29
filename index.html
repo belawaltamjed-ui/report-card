@@ -15,7 +15,7 @@
     .dash-pair{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;}
     .dash-pair .dash{flex:1 1 300px;min-width:280px;}
     .dash-head{display:flex;align-items:center;gap:14px;border-bottom:1px solid #d8cfb8;padding-bottom:18px;margin-bottom:22px;}
-    .dash-logo{width:52px;height:52px;border-radius:12px;background:#f3efe3;border:1px solid #d8cfb8;display:flex;align-items:center;justify-content:center;font-size:26px;color:#7a1f2b;flex-shrink:0;overflow:hidden;}
+    .dash-logo{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;color:#7a1f2b;flex-shrink:0;overflow:hidden;}
     .dash-logo img{width:100%;height:100%;object-fit:contain;}
     .dash-name{font-family:'Noto Serif Bengali',serif;font-weight:700;font-size:18px;margin:0;color:#211e1a;}
     .dash-badge{font-size:11px;font-weight:700;color:#7a1f2b;background:#fbf1ec;padding:2px 14px;border-radius:30px;display:inline-block;margin-top:4px;}
@@ -105,7 +105,7 @@
     .tpl-card{background:#fff;border:2px solid #555;padding:22px 26px;font-family:'Georgia','Times New Roman',serif;color:#111;}
     .tpl-top{display:flex;align-items:flex-start;gap:16px;}
     .tpl-logo{width:64px;height:64px;object-fit:contain;flex-shrink:0;margin-top:4px;}
-    .tpl-logo-ph{width:64px;height:64px;border:1px solid #999;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#999;font-family:'Noto Sans Bengali',sans-serif;margin-top:4px;overflow:hidden;}
+    .tpl-logo-ph{width:64px;height:64px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#999;font-family:'Noto Sans Bengali',sans-serif;margin-top:4px;overflow:hidden;}
     .tpl-logo-ph img{width:100%;height:100%;object-fit:contain;}
     .tpl-titles{flex:1;text-align:center;}
     .tpl-titles .school{font-size:23px;font-weight:700;margin:0;font-family:Georgia,'Times New Roman',serif;}
@@ -151,8 +151,8 @@
     .classrep-school{font-family:'Noto Serif Bengali',serif;font-size:21px;font-weight:700;color:#145a32;}
     .classrep-sub{font-size:12.5px;color:#a41f2b;font-weight:600;margin-top:2px;}
     .classrep-meta{font-size:12px;color:#333;margin-top:6px;border-top:2px solid #145a32;padding-top:8px;}
-    table.classrep{width:100%;border-collapse:collapse;font-size:11px;font-family:'Noto Sans Bengali',sans-serif;margin-bottom:16px;}
-    table.classrep th,table.classrep td{border:1px solid #145a32;padding:5px 6px;text-align:center;}
+    table.classrep{border-collapse:collapse;font-size:11px;font-family:'Noto Sans Bengali',sans-serif;margin-bottom:16px;}
+    table.classrep th,table.classrep td{border:1px solid #145a32;padding:5px 6px;text-align:center;white-space:nowrap;}
     table.classrep th{background:#145a32;color:#fff;font-weight:700;}
     table.classrep tbody tr:nth-child(even){background:#eef6f0;}
     table.classrep td.nm{text-align:left;}
@@ -168,7 +168,10 @@
     .a4-sheet{width:210mm;height:297mm;margin:0 auto 22px;background:#fff;box-shadow:0 4px 22px rgba(0,0,0,.16);position:relative;overflow:hidden;box-sizing:border-box;}
     .a4-fit-wrap{position:absolute;top:12mm;left:12mm;width:186mm;height:273mm;overflow:hidden;}
     .a4-fit-wrap .tpl-card{transform-origin:top left;}
-    @media print{body *{visibility:hidden;}#printArea,#printArea *{visibility:visible;}#printArea{position:absolute;top:0;left:0;width:100%;margin:0;padding:0;}.no-print{display:none !important;}.a4-sheet{margin:0;box-shadow:none;}@page{size:A4 portrait;margin:0;}}
+    .a4-sheet-landscape{width:297mm;height:210mm;margin:0 auto 22px;background:#fff;box-shadow:0 4px 22px rgba(0,0,0,.16);position:relative;overflow:hidden;box-sizing:border-box;}
+    .a4-landscape-fit-wrap{position:absolute;top:10mm;left:10mm;width:277mm;height:190mm;overflow:hidden;}
+    .a4-landscape-fit-wrap .classrep-sheet{transform-origin:top left;}
+    @media print{body *{visibility:hidden;}#printArea,#printArea *{visibility:visible;}#printArea{position:absolute;top:0;left:0;width:100%;margin:0;padding:0;}.no-print{display:none !important;}.a4-sheet,.a4-sheet-landscape{margin:0;box-shadow:none;}@page{size:A4 portrait;margin:0;}}
     .progress{display:flex;gap:6px;justify-content:center;margin-bottom:22px;}
     .progress span{width:7px;height:7px;border-radius:50%;background:#d8cfb8;transition:background .2s;}
     .progress span.done{background:#ad8a4e;}
@@ -1419,7 +1422,25 @@
       <div id="printArea">${cardsHtml}</div>
     `;
 
+    setPrintOrientation('portrait');
     fitCardsToA4();
+  }
+
+  // ============================================================
+  // PRINT ORIENTATION
+  // Individual report cards print portrait (one student per A4 page).
+  // The combined class report prints landscape, since it has many
+  // subject columns and needs the extra width to fit on one page.
+  // ============================================================
+  function setPrintOrientation(orientation) {
+    let style = document.getElementById('printOrientationStyle');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'printOrientationStyle';
+      document.head.appendChild(style);
+    }
+    const margin = orientation === 'landscape' ? '0' : '0';
+    style.textContent = `@media print { @page { size: A4 ${orientation}; margin: ${margin}; } }`;
   }
 
   // ============================================================
@@ -1451,7 +1472,36 @@
     }
     setTimeout(run, 400);
   }
-  window.addEventListener('beforeprint', fitCardsToA4);
+
+  // Same idea as fitCardsToA4, but for the combined class report table:
+  // no matter how many subject columns it has, it's scaled down (never
+  // up) to always fit within one landscape A4 page.
+  function fitClassRepToA4() {
+    const run = () => {
+      document.querySelectorAll('.a4-landscape-fit-wrap').forEach(wrap => {
+        const sheet = wrap.querySelector('.classrep-sheet');
+        if (!sheet) return;
+        sheet.style.transform = 'none';
+        sheet.style.width = wrap.clientWidth + 'px';
+        const naturalWidth = sheet.scrollWidth;
+        const naturalHeight = sheet.scrollHeight;
+        const targetWidth = wrap.clientWidth;
+        const targetHeight = wrap.clientHeight;
+        if (!naturalWidth || !naturalHeight || !targetWidth || !targetHeight) return;
+        let scale = Math.min(targetWidth / naturalWidth, targetHeight / naturalHeight);
+        scale = Math.min(scale, 1); // never scale up, only shrink to fit
+        sheet.style.width = (targetWidth / scale) + 'px';
+        sheet.style.transform = 'scale(' + scale + ')';
+      });
+    };
+    requestAnimationFrame(() => requestAnimationFrame(run));
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(run).catch(() => {});
+    }
+    setTimeout(run, 400);
+  }
+  window.addEventListener('beforeprint', () => { fitCardsToA4(); fitClassRepToA4(); });
+  window.addEventListener('resize', () => { fitCardsToA4(); fitClassRepToA4(); });
 
   function renderClassReport() {
     const record = currentRecord;
@@ -1499,29 +1549,36 @@
         </div>
       </div>
       <div id="printArea">
-        <div class="classrep-sheet">
-          <div class="classrep-head">
-            <div class="classrep-school">${escapeHtml(ACCOUNT_DATA.name)}</div>
-            <div class="classrep-sub">Combined Result Sheet — ${escapeHtml(record.session || '2026')}</div>
-            <div class="classrep-meta">Class: ${escapeHtml(record.className)} &nbsp;&nbsp; Section/Group: ${escapeHtml(record.section||'-')}</div>
-          </div>
-          <table class="classrep">
-            <thead><tr><th>Name</th><th>Roll</th>${subjects.map(s=>`<th>${escapeHtml(s.name)}<br><span style="font-weight:400;">(Full ${s.full})</span></th>`).join('')}<th>Total</th><th>Grade</th><th>GPA</th><th>Result</th><th>Present</th><th>Position</th></tr></thead>
-            <tbody>${rowsHtml || `<tr><td colspan="${7+subjects.length}" class="classrep-empty">No data available. Please add students.</td></tr>`}</tbody>
-          </table>
-          <div class="classrep-sign-row">
-            <div class="classrep-sig-col">
-              <div class="classrep-sig-line"></div>
-              <div>${escapeHtml(SIGNATURES.classTeacher.name || 'Class Teacher')}<br><small>Class Teacher's Signature</small></div>
-            </div>
-            <div class="classrep-sig-col">
-              <div class="classrep-sig-line"></div>
-              <div>${escapeHtml(SIGNATURES.principal.name || 'Head Teacher')}<br><small>Head Teacher's Signature</small></div>
+        <div class="a4-sheet-landscape">
+          <div class="a4-landscape-fit-wrap">
+            <div class="classrep-sheet">
+              <div class="classrep-head">
+                <div class="classrep-school">${escapeHtml(ACCOUNT_DATA.name)}</div>
+                <div class="classrep-sub">Combined Result Sheet — ${escapeHtml(record.session || '2026')}</div>
+                <div class="classrep-meta">Class: ${escapeHtml(record.className)} &nbsp;&nbsp; Section/Group: ${escapeHtml(record.section||'-')}</div>
+              </div>
+              <table class="classrep">
+                <thead><tr><th>Name</th><th>Roll</th>${subjects.map(s=>`<th>${escapeHtml(s.name)}<br><span style="font-weight:400;">(Full ${s.full})</span></th>`).join('')}<th>Total</th><th>Grade</th><th>GPA</th><th>Result</th><th>Present</th><th>Position</th></tr></thead>
+                <tbody>${rowsHtml || `<tr><td colspan="${7+subjects.length}" class="classrep-empty">No data available. Please add students.</td></tr>`}</tbody>
+              </table>
+              <div class="classrep-sign-row">
+                <div class="classrep-sig-col">
+                  <div class="classrep-sig-line"></div>
+                  <div>${escapeHtml(SIGNATURES.classTeacher.name || 'Class Teacher')}<br><small>Class Teacher's Signature</small></div>
+                </div>
+                <div class="classrep-sig-col">
+                  <div class="classrep-sig-line"></div>
+                  <div>${escapeHtml(SIGNATURES.principal.name || 'Head Teacher')}<br><small>Head Teacher's Signature</small></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     `;
+
+    setPrintOrientation('landscape');
+    fitClassRepToA4();
   }
 
   function buildTemplateCardHTML(record, student, subjects) {
@@ -1672,8 +1729,10 @@
           <tr class="totalrow">
             <td colspan="2">Total Exam Marks</td>
             <td>${totalFull||'—'}</td>
-            <td colspan="6"></td>
-            <td colspan="3">Obtain Marks: ${student ? totalObtained : '—'} &nbsp;|&nbsp; GPA: ${student && overallGrade ? overallGrade.point.toFixed(2) : '—'}</td>
+            <td colspan="5"></td>
+            <td>${student ? totalObtained : '—'}</td>
+            <td></td>
+            <td colspan="2">GPA: ${student && overallGrade ? overallGrade.point.toFixed(2) : '—'}</td>
           </tr>
         </tbody>
       </table>
