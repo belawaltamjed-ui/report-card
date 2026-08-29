@@ -108,9 +108,9 @@
     .tpl-logo-ph{width:64px;height:64px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#999;font-family:'Noto Sans Bengali',sans-serif;margin-top:4px;overflow:hidden;}
     .tpl-logo-ph img{width:100%;height:100%;object-fit:contain;}
     .tpl-titles{flex:1;text-align:center;}
-    .tpl-titles .school{font-size:23px;font-weight:700;margin:0;font-family:Georgia,'Times New Roman',serif;}
+    .tpl-titles .school{font-size:23px;font-weight:700;margin:0;font-family:Georgia,'Times New Roman',serif;color: #db2641}
     .tpl-titles .addr{font-size:13px;color:#222;margin:3px 0 1px;font-family:Georgia,serif;}
-    .tpl-titles .script{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:24px;margin:10px 0 0;font-weight:600;}
+    .tpl-titles .script{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:24px;margin:10px 0 0;font-weight:600;color: #8d1829}
     .tpl-titles .exam{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:17px;font-weight:600;}
     .tpl-info-row{display:flex;gap:10px;margin-top:14px;align-items:flex-start;}
     table.tpl-info{border-collapse:collapse;flex:1;font-size:12px;font-family:Georgia,serif;}
@@ -171,7 +171,7 @@
     .a4-sheet-landscape{width:297mm;height:210mm;margin:0 auto 22px;background:#fff;box-shadow:0 4px 22px rgba(0,0,0,.16);position:relative;overflow:hidden;box-sizing:border-box;}
     .a4-landscape-fit-wrap{position:absolute;top:10mm;left:10mm;width:277mm;height:190mm;overflow:hidden;z-index:1;}
     .a4-landscape-fit-wrap .classrep-sheet{transform-origin:top left;}
-    .page-watermark{position:absolute;top:50%;left:50%;width:65%;height:65%;transform:translate(-50%,-50%);background-image:url('logo.png');background-repeat:no-repeat;background-position:center;background-size:contain;opacity:0.12;z-index:0;pointer-events:none;}
+    .page-watermark{position:absolute;top:50%;left:50%;width:60%;height:60%;transform:translate(-50%,-50%);background-image:url('logo.png');background-repeat:no-repeat;background-position:center;background-size:contain;opacity:0.04;z-index:100;pointer-events:none;}
     @media print{
       *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important;}
       body *{visibility:hidden;}
@@ -224,7 +224,7 @@
   <div class="loading-page" id="loadingPage">
     <div class="loading-logo-wrap">
       <div class="loading-ring"></div>
-      <img class="loading-logo-img" src="apk_logo.jpeg" alt="Report Card Maker" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <img class="loading-logo-img" src="icon.png" alt="Report Card Maker" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
       <div class="loading-logo-fallback" style="display:none;">📘</div>
     </div>
     <div class="loading-title">Report Card Maker</div>
@@ -912,6 +912,12 @@
           <button class="btn btn-primary" style="width:auto;padding:8px 20px;margin:0;" onclick="updateShift()">Update Shift</button>
         </div>
 
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+          <label style="font-size:12px;font-weight:600;color:#6b6455;">Session:</label>
+          <input type="text" id="classSession" value="${escapeAttr(record.session||'2026')}" style="flex:1;min-width:150px;padding:8px 12px;border:1px solid #d8cfb8;border-radius:6px;font-size:13px;background:#fbf9f3;">
+          <button class="btn btn-primary" style="width:auto;padding:8px 20px;margin:0;" onclick="updateSession()">Update Session</button>
+        </div>
+
         <div class="status-input-row">
           <div><label>Section Position (Auto Calculated)</label><input type="text" id="status_position" value="${escapeAttr(status.sectionPosition)}" readonly style="background:#eee;cursor:not-allowed;"></div>
           <div><label>GPA [Without 4th] (Auto Calculated)</label><input type="text" id="status_gpa" value="${escapeAttr(status.gpaWithout4th)}" readonly style="background:#eee;cursor:not-allowed;"></div>
@@ -938,6 +944,15 @@
     if (!shiftSelect) return;
     currentRecord.shift = shiftSelect.value;
     alert('Shift updated to: ' + currentRecord.shift);
+  }
+
+  function updateSession() {
+    if (!currentRecord) return;
+    const sessionInput = document.getElementById('classSession');
+    if (!sessionInput) return;
+    currentRecord.session = sessionInput.value.trim() || '2026';
+    persistState();
+    alert('Session updated to: ' + currentRecord.session);
   }
 
   function saveStatus() {
@@ -1778,7 +1793,6 @@
       </div>
       <div class="tpl-footer-tiny">
         <span>Established: ${escapeHtml(ACCOUNT_DATA.established)} &nbsp;|&nbsp; EIIN: ${escapeHtml(ACCOUNT_DATA.eiin)}</span>
-        <span>Publish Date: —</span>
       </div>
     </div>`;
   }
